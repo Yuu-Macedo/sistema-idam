@@ -662,7 +662,7 @@ export default function CronogramaVisitas() {
       {/* Calendário Semanal */}
       <div
         ref={componentRef}
-        className="bg-white rounded-xl border border-border overflow-hidden shadow-sm cronograma-visitas-print"
+        className="bg-white rounded-xl border border-border overflow-hidden shadow-sm cronograma-visitas-print cronograma-semanal-print"
       >
         {/* Header do Calendário */}
         <div className="bg-primary text-primary-foreground p-4 print:p-6">

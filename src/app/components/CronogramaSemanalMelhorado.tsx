@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, { useState, useMemo, useRef } from "react";
 import {
   Calendar,
-  Plus,
   Trash2,
   Edit2,
   ChevronLeft,
@@ -121,6 +120,7 @@ export default function CronogramaSemanalMelhorado() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [atividadeEditando, setAtividadeEditando] = useState<Atividade | null>(null);
   const [buscaProdutor, setBuscaProdutor] = useState("");
+  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
   const componentRef = useRef<HTMLDivElement>(null);
 
   const [formData, setFormData] = useState<FormData>(FORM_INICIAL);
@@ -136,14 +136,6 @@ export default function CronogramaSemanalMelhorado() {
       )
       .slice(0, 5);
   }, [buscaProdutor, produtores]);
-
-  const [mostrarSugestoes, setMostrarSugestoes] = useState(false);
-
-  useEffect(() => {
-    setMostrarSugestoes(
-      produtoresFiltrados.length > 0 && buscaProdutor.trim().length > 0,
-    );
-  }, [produtoresFiltrados, buscaProdutor]);
 
   const getSegundaDaSemana = (data: Date) => {
     const dia = data.getDay();
@@ -227,24 +219,19 @@ export default function CronogramaSemanalMelhorado() {
     setAtividadeEditando(null);
   };
 
+  const abrirFormularioNovaVisita = () => {
+    resetarCampos();
+    setMostrarFormulario(true);
+  };
+
   // ✅ CORREÇÃO: fechar o formulário separado do reset
   const fecharFormulario = () => {
     resetarCampos();
     setMostrarFormulario(false);
   };
 
-  const abrirNovaAtividade = () => {
-    resetarCampos();
-    setMostrarFormulario(true);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.produtorNome || formData.produtorNome.trim() === "") {
-      alert("Por favor, selecione ou informe o nome do produtor.");
-      return;
-    }
 
     if (
       formData.status !== "pendente" &&
@@ -387,14 +374,23 @@ export default function CronogramaSemanalMelhorado() {
             </div>
           </div>
 
-          {/* ✅ CORREÇÃO: chama abrirNovaAtividade em vez de limparFormulario */}
-          <button
-            onClick={abrirNovaAtividade}
-            className="flex items-center gap-2 px-6 py-3 bg-white text-pink-700 rounded-lg hover:bg-pink-50 transition-all shadow-lg font-semibold"
-          >
-            <Plus className="w-5 h-5" />
-            Nova Atividade
-          </button>
+          <div className="no-print flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={abrirFormularioNovaVisita}
+              className="rounded-lg bg-white text-pink-700 px-4 py-2 font-semibold shadow hover:bg-pink-50 transition-all"
+            >
+              Adicionar nova visita
+            </button>
+
+            <button
+              type="button"
+              onClick={() => window.print()}
+              className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white shadow hover:bg-emerald-700 transition-all"
+            >
+              Imprimir Cronograma
+            </button>
+          </div>
         </div>
       </div>
 
@@ -437,7 +433,7 @@ export default function CronogramaSemanalMelhorado() {
             {/* PRODUTOR - AUTOCOMPLETE */}
             <div className="relative">
               <label className="block text-sm font-semibold text-foreground mb-2">
-                Produtor <span className="text-red-500">*</span>
+                Produtor <span className="text-muted-foreground text-sm">(Opcional)</span>
               </label>
               <div className="relative">
                 <input
@@ -445,6 +441,7 @@ export default function CronogramaSemanalMelhorado() {
                   value={buscaProdutor}
                   onChange={(e) => {
                     setBuscaProdutor(e.target.value);
+                    setMostrarSugestoes(e.target.value.trim().length > 0);
                     if (e.target.value && !formData.produtorCadastrado) {
                       setFormData((prev) => ({
                         ...prev,
@@ -809,7 +806,7 @@ export default function CronogramaSemanalMelhorado() {
       {/* CRONOGRAMA VISUAL */}
       <div
         ref={componentRef}
-        className="bg-white rounded-xl border border-border overflow-hidden shadow-sm"
+        className="bg-white rounded-xl border border-border overflow-hidden shadow-sm cronograma-semanal-print"
       >
         <div className="bg-gradient-to-r from-pink-600 to-pink-700 text-white p-4">
           <h3 className="text-center font-bold text-lg">

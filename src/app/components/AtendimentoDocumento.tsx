@@ -1,21 +1,4 @@
-interface Produtor {
-  id: string;
-  nome: string;
-  cpf?: string;
-  telefone?: string;
-  email?: string;
-  logradouro?: string;
-  municipio?: string;
-  uf?: string;
-  comunidade?: string;
-  atividades?: {
-    categoria?: string;
-    tipos?: string[];
-  }[];
-  [key: string]: unknown;
-}
-
-type AnyRecord = Record<string, any>;
+type AnyRecord = Record<string, unknown>;
 
 interface Props {
   produtor: AnyRecord;
@@ -28,6 +11,7 @@ interface Props {
     pecuaria: string[];
   };
   tecnicoResponsavel?: string;
+  gerenteResponsavel?: string;
   data?: string;
 }
 

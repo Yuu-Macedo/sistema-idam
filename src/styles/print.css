@@ -24,11 +24,7 @@
     color: black !important;
   }
 
-  /* Garantir que o documento ocupe a página toda */
-  html, body {
-    width: 297mm;
-    height: 210mm;
-  }
+  /* Removido ajuste global de tamanho em html/body — usar container específico */
 
   /* Evitar quebras de página indesejadas */
   h1, h2, h3, h4, h5, h6 {
@@ -43,16 +39,25 @@
   * {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
   }
 
   /* Garantir que o cronograma ocupe A4 paisagem e mantenha cores */
+  .cronograma-semanal-print,
   .cronograma-visitas-print {
     width: 297mm;
     min-height: 210mm;
     background: white;
-    print-color-adjust: exact;
-    -webkit-print-color-adjust: exact;
+    margin: 0 auto;
+    padding: 12mm;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Classe para ocultar apenas na impressão (usada nos botões) */
+  .no-print {
+    display: none !important;
   }
 
   /* Melhorar legibilidade */
@@ -98,7 +103,8 @@
   [style*="background-color"] {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    -webkit-print-color-adjust: exact !important;
   }
 
   /* Mostrar elementos marcados para impressão */

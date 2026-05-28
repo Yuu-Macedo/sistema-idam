@@ -1,4 +1,5 @@
 interface ProdutorData {
+  dataRegistro?: string;
   [key: string]: unknown;
 }
 

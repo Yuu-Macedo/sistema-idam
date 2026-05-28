@@ -80,7 +80,10 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
     const stored = localStorage.getItem("veiculosUnidade");
     return stored ? JSON.parse(stored) : [];
   });
-  const [form, setForm] = useState(initialFormState);
+  const [form, setForm] = useState(() => ({
+    ...initialFormState,
+    responsavelCadastro: usuarioLogado?.nome || "",
+  }));
   const [editId, setEditId] = useState<string | null>(null);
   const [mensagem, setMensagem] = useState<string>("");
   const [veiculoSelecionadoId, setVeiculoSelecionadoId] = useState<string | null>(null);
@@ -248,13 +251,6 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
 
     setMensagem("Veículo devolvido e liberado com sucesso.");
   };
-
-  useEffect(() => {
-    setForm((current) => ({
-      ...current,
-      responsavelCadastro: usuarioLogado?.nome || current.responsavelCadastro,
-    }));
-  }, [usuarioLogado]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
