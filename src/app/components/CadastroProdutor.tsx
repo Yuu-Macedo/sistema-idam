@@ -1,3 +1,12 @@
+type CulturaAgricola = {
+  id: string;
+  nome: string;
+  tipo: string;
+  areaPlantada: string;
+  produtividadeMedia: string;
+  producaoTotal: string;
+};
+
 import { useState } from "react";
 import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "./ui/badge";
@@ -200,11 +209,25 @@ interface CadastroProdutorFormData {
 export default function CadastroProdutor() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [modoEdicao, setModoEdicao] = useState(false);
-  const [produtorEmEdicaoId, setProdutorEmEdicaoId] = useState<
-    string | null
-  >(null);
+  const [produtorEmEdicaoId, setProdutorEmEdicaoId] =
+  useState<string | null>(null);
+  const [culturas, setCulturas] = useState<CulturaAgricola[]>([]);
   const [buscaProdutor, setBuscaProdutor] = useState("");
   const [mostrarListaProdutores, setMostrarListaProdutores] = useState(false);
+
+  const adicionarCultura = () => {
+  setCulturas([
+    ...culturas,
+    {
+      id: crypto.randomUUID(),
+      nome: "",
+      tipo: "",
+      areaPlantada: "",
+      produtividadeMedia: "",
+      producaoTotal: "",
+    },
+  ]);
+};
   const totalSteps = 7;
   const [formData, setFormData] =
     useState<CadastroProdutorFormData>({
