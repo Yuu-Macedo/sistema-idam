@@ -30,7 +30,8 @@ interface CadastroProdutorFormData {
   grauInstrucao: string;
   estadoCivil: string;
   raca: string;
-  sexo: string; // Homem, Mulher, Jovem
+  sexo: string;
+  publico: string; // Homem, Mulher, Jovem
 
   // ================== ENDEREÇO ==================
   logradouro: string;
@@ -243,6 +244,7 @@ export default function CadastroProdutor() {
       estadoCivil: "",
       raca: "",
       sexo: "",
+      publico: "",
       logradouro: "",
       bairro: "",
       municipio: "",
@@ -641,6 +643,7 @@ export default function CadastroProdutor() {
       estadoCivil: "",
       raca: "",
       sexo: "",
+      publico: "",
       logradouro: "",
       bairro: "",
       municipio: "",
@@ -1194,11 +1197,12 @@ export default function CadastroProdutor() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div className="md:col-span-2">
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="nome">
                   Nome do Produtor(a){" "}
                   <span className="text-destructive">*</span>
                 </label>
                 <input
+                  aria-labelledby="nome"
                   type="text"
                   required
                   value={formData.nome}
@@ -1212,11 +1216,12 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="cpf">
                   CPF{" "}
                   <span className="text-destructive">*</span>
                 </label>
                 <input
+                  aria-labelledby="cpf"
                   type="text"
                   required
                   value={formData.cpf}
@@ -1231,10 +1236,11 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="rg">
                   RG <span className="text-destructive">*</span>
                 </label>
                 <input
+                  aria-labelledby="rg"
                   type="text"
                   required
                   value={formData.rg}
@@ -1248,10 +1254,11 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="orgaoExpedidor">
                   Órgão Expedidor
                 </label>
                 <input
+                  aria-labelledby="orgaoExpedidor"
                   type="text"
                   value={formData.orgaoExpedidor}
                   onChange={(e) =>
@@ -1264,11 +1271,12 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="dataNascimento">
                   Data de Nascimento{" "}
                   <span className="text-destructive">*</span>
                 </label>
                 <input
+                  aria-labelledby="dataNascimento"
                   type="date"
                   required
                   value={formData.dataNascimento}
@@ -1282,10 +1290,11 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="nacionalidade">
                   Nacionalidade
                 </label>
                 <input
+                  aria-labelledby="nacionalidade"
                   type="text"
                   value={formData.nacionalidade}
                   onChange={(e) =>
@@ -1298,10 +1307,11 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="municipioNascimento">
                   Município de Nascimento - UF
                 </label>
                 <input
+                  aria-labelledby="municipioNascimento"
                   type="text"
                   value={formData.municipioNascimento}
                   onChange={(e) =>
@@ -1314,7 +1324,7 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="telefone">
                   Telefone{" "}
                   <span className="text-destructive">*</span>
                 </label>
@@ -1333,10 +1343,11 @@ export default function CadastroProdutor() {
                 />
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="grauInstrucao">
                   Grau de Instrução
                 </label>
                 <select
+                  aria-labelledby="grauInstrucao"
                   value={formData.grauInstrucao}
                   onChange={(e) =>
                     setFormData({
@@ -1357,10 +1368,11 @@ export default function CadastroProdutor() {
                 </select>
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="estadoCivil">
                   Estado Civil
                 </label>
                 <select
+                  aria-labelledby="estadoCivil"
                   value={formData.estadoCivil}
                   onChange={(e) =>
                     setFormData({
@@ -1379,10 +1391,11 @@ export default function CadastroProdutor() {
                 </select>
               </div>
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="raca">
                   Raça ou Cor
                 </label>
                 <select
+                  aria-labelledby="raca"
                   value={formData.raca}
                   onChange={(e) =>
                     setFormData({
@@ -1402,10 +1415,11 @@ export default function CadastroProdutor() {
               </div>
 
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="sexo">
                   Sexo <span className="text-destructive">*</span>
                 </label>
                 <select
+                  aria-labelledby="sexo"
                   value={formData.sexo}
                   onChange={(e) =>
                     setFormData({
@@ -1417,11 +1431,33 @@ export default function CadastroProdutor() {
                   required
                 >
                   <option value="">Selecione</option>
+                  <option value="Masculino">Masculino</option>
+                  <option value="Feminino">Feminino</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-foreground mb-2" id="publico">
+                  Público <span className="text-destructive">*</span>
+                </label>
+                <select
+                  aria-labelledby="publico"
+                  value={formData.publico}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      publico: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
+                  required
+                >
+                  <option value="">Selecione</option>
                   <option value="Homem">Homem</option>
                   <option value="Mulher">Mulher</option>
                   <option value="Jovem">Jovem</option>
                 </select>
-              </div>
+              </div>    
             </div>
           </div>
         )}
@@ -1439,7 +1475,7 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div className="md:col-span-2">
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="logradouro">
                     Logradouro e Número{" "}
                     <span className="text-destructive">*</span>
                   </label>
