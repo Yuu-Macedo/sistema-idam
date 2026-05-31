@@ -27,6 +27,8 @@ interface Produtor {
   }[];
 }
 
+
+
 interface DadosAtendimento {
   observacoes?: string;
   diagnostico?: string;
@@ -3391,7 +3393,7 @@ export default function Atendimento() {
                 <div className="overflow-auto border rounded-lg bg-gray-100 p-4">
                   <div ref={componentRef}>
                     <AtendimentoDocumento
-                      produtor={selectedProdutor}
+                      produtor={selectedProdutor.nome}
                       atendimento={ultimoAtendimentoSalvo.dados}
                       atividadesAdicionais={ultimoAtendimentoSalvo.atividadesAdicionais}
                       tecnicoResponsavel={

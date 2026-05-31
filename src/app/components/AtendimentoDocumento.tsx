@@ -1,7 +1,7 @@
 type AnyRecord = Record<string, unknown>;
 
 interface Props {
-  produtor: AnyRecord;
+  produtor: string;
   atendimento: AnyRecord;
   atividadesAdicionais?: {
     agricultura: string[];
