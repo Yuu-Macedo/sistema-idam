@@ -207,6 +207,197 @@ interface CadastroProdutorFormData {
   observacoes: string;
 }
 
+interface Produtor extends CadastroProdutorFormData {
+  id: string;
+  dataAtualizacao?: string;
+  // ================== DADOS PESSOAIS ==================
+  nome: string;
+  cpf: string;
+  rg: string;
+  orgaoExpedidor: string;
+  dataNascimento: string;
+  nacionalidade: string;
+  municipioNascimento: string;
+  telefone: string;
+  grauInstrucao: string;
+  estadoCivil: string;
+  raca: string;
+  sexo: string;
+  publico: string; // Homem, Mulher, Jovem
+
+  // ================== ENDEREÇO ==================
+  logradouro: string;
+  bairro: string;
+  municipio: string;
+  uf: string;
+  codigoMunicipio: string;
+  cep: string;
+
+  // ================== LOCALIZAÇÃO ==================
+  tipoLocalizacao: string;
+  especificacaoLocalizacao: string; // Nova descrição detalhada
+  km: string;
+  margem: string;
+  tipoCoordenada: string; // "decimal" ou "geografica"
+  latitude: string;
+  longitude: string;
+  latitudeGraus?: string;
+  latitudeMinutos?: string;
+  latitudeSegundos?: string;
+  latitudeDirecao?: string;
+  longitudeGraus?: string;
+  longitudeMinutos?: string;
+  longitudeSegundos?: string;
+  longitudeDirecao?: string;
+  comunidade: string;
+
+  // ================== PERFIL ==================
+  perfil: string[];
+  situacaoImovel: string;
+  caracteristicas: string[];
+
+  // ================== ATIVIDADES ==================
+  atividades: {
+    categoria: string;
+    tipos: string[];
+  }[];
+
+  atividadePrincipal: string;
+  atividadeSecundaria: string;
+  outrasProducoes: string;
+  outrasInformacoesAtividades: string; // Outras informações sobre atividades
+
+  // ================== PASTAGEM ==================
+  pastagemTerraFirme: string;
+  pastagemVarzea: string;
+  pastagemCapineira: string;
+  descricaoPastagem: string; // Descrição detalhada da pastagem
+
+  // ================== ÁREA ==================
+  nomeImovel: string;
+  areaTotal: string;
+  areaEstado: string;
+  areaOutroEstado: string;
+  areaAgricultura: string;
+  areaPastagem: string;
+  areaArrendada: string;
+  areaParceria: string;
+
+  // ================== EXTRATIVISMO ==================
+  numeroExtrativistas: string;
+  numeroPmfspe: string;
+  numeroPmfspeRegularizado: string;
+  novoPoe: string;
+  posExploratorio: string;
+  areaTotalPlanos: string;
+  volumeTotal: string;
+  volumeRegularizado: string;
+  volumePotencial: string;
+
+  // ================== PESCA ==================
+  tipoPesca: string;
+  rgPesca: string;
+  protocoloRgp: string;
+  localPesca: string;
+  margemPesca: string;
+  producaoTotal: string;
+  especies: { nome: string; kg: string }[];
+
+  // Piscicultura
+  tipoSistema: string;
+  areaPiscicultura: string;
+  numeroPeixes: string;
+  producaoPiscicultura: string;
+
+  // Apicultura
+  abelhas: {
+    tipo: string;
+    numeroColmeias: string;
+    producaoMel: string;
+    producaoPolen: string;
+    producaoPropolis: string;
+  }[];
+
+  // Extrativismo melhorado
+  produtoExtrativista: string;
+  quantidadeExtrativismo: string;
+
+  // Pecuária
+  pecuaria: Array<{
+    tipo: string;
+    quantidade: string;
+    unidade: string; // "cabeças" ou "aves"
+  }>;
+
+  sistemaCriacao: string;
+  informacoesPecuariaPos: string; // Informações em Pós para pecuária
+  // Lavoura
+  culturaPrincipal: string;
+  areaPlantada: string;
+  areaAssistida: string;
+  areaColhida: string;
+  producaoObtidaAgricultura: string;
+
+  // Extrativismo (se quiser completar também)
+  produtoExtraido: string;
+  producaoAnual: string;
+
+  producaoFlorestal: Array<{
+    produto: string;
+    quantidade: string;
+    unidade: string;
+  }>;
+
+  possuiSistemaAgroflorestal: boolean;
+  numeroPlantasAcai: string;
+  numeroPlantasBanana: string;
+  numeroPlantasCastanha: string;
+  numeroPlantasCacau: string;
+
+  // ================== REGISTRO ==================
+  anoEmissao: string;
+  codigoUnloc: string;
+  codigoRgp: string;
+  municipioUf: string;
+  dataRegistro: string;
+  tipoSolicitacao: string;
+
+  situacaoProdutor: string;
+
+  possuiCaf: boolean;
+  numeroCaf: string;
+  vencimentoCaf: string;
+
+  possuiCar: boolean;
+  numeroCar: string;
+  dataInscricaoCar: string;
+
+  possuiCarteiraProdutor: boolean;
+  numeroCarteiraProdutor: string;
+  vencimentoCarteiraProdutor: string;
+
+  // ================== SUPERVISÃO ==================
+  observacoesBeneficiario: string;
+  declaracaoBeneficiario: boolean;
+  resultadoSupervisao: string;
+  encaminhamentos: string;
+  tipoEncaminhamento: string;
+  observacoesTecnico: string;
+
+  // ================== RESPONSÁVEIS ==================
+  tecnicoResponsavel: string;
+  numeroConselho: string;
+  gerente: string;
+  conselhoGerente: string;
+  observacoes: string;
+}
+
+interface Documento {
+  nome: string;
+  tipo: string;
+  base64: string;
+}
+
 export default function CadastroProdutor() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [modoEdicao, setModoEdicao] = useState(false);
@@ -420,7 +611,7 @@ export default function CadastroProdutor() {
 
   const limparCpf = (valor: string) => valor.replace(/\D/g, "");
 
-  const carregarProdutores = (): any[] => {
+  const carregarProdutores = (): Produtor[] => {
     try {
       return JSON.parse(localStorage.getItem("produtores") || "[]");
     } catch {
@@ -588,7 +779,7 @@ export default function CadastroProdutor() {
     const files = e.target.files;
     if (!files) return;
 
-    const novosArquivos: any[] = [];
+    const novosArquivos: Documento[] = [];
 
     Array.from(files).forEach((file) => {
       const reader = new FileReader();
@@ -615,8 +806,9 @@ export default function CadastroProdutor() {
 
   const carregarProdutorParaEdicao = (produtorId: string) => {
     const produtores = carregarProdutores();
-    const produtor = produtores.find((p: any) => p.id === produtorId);
-
+    const produtor = produtores.find(
+  (p) => p.id === produtorId
+);
     if (produtor) {
       setFormData(produtor);
       setProdutorEmEdicaoId(produtorId);
@@ -773,7 +965,7 @@ export default function CadastroProdutor() {
     }
 
     const cpfDuplicado = produtores.some(
-      (p: any) =>
+      (p: Produtor) =>
         limparCpf(p.cpf) === cpfAtualLimpo &&
         p.id !== produtorEmEdicaoId,
     );
@@ -785,7 +977,7 @@ export default function CadastroProdutor() {
 
 
     if (modoEdicao && produtorEmEdicaoId) {
-      const atualizados = produtores.map((p: any) =>
+      const atualizados = produtores.map((p: Produtor) =>
         p.id === produtorEmEdicaoId
           ? {
               ...p,
@@ -836,6 +1028,7 @@ export default function CadastroProdutor() {
       estadoCivil: "",
       raca: "",
       sexo: "",
+      publico: "",
       logradouro: "",
       bairro: "",
       municipio: "",
@@ -1043,7 +1236,7 @@ export default function CadastroProdutor() {
                 const produtores = carregarProdutores();
                 const buscaCpfLimpo = limparCpf(buscaProdutor);
                 const produtoresFiltrados = produtores.filter(
-                  (p: any) =>
+                  (p: Produtor) =>
                     p.nome.toLowerCase().includes(buscaProdutor.toLowerCase()) ||
                     limparCpf(p.cpf).includes(buscaCpfLimpo),
                 );
@@ -1058,7 +1251,7 @@ export default function CadastroProdutor() {
                   );
                 }
 
-                return produtoresFiltrados.map((produtor: any) => (
+                return produtoresFiltrados.map((produtor: Produtor) => (
                   <button
                     key={produtor.id}
                     onClick={() => {
@@ -1480,6 +1673,7 @@ export default function CadastroProdutor() {
                     <span className="text-destructive">*</span>
                   </label>
                   <input
+                    aria-labelledby="logradouro"
                     type="text"
                     required
                     value={formData.logradouro}
@@ -1493,10 +1687,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="bairro">
                     Bairro
                   </label>
                   <input
+                    aria-labelledby="bairro"
                     type="text"
                     value={formData.bairro}
                     onChange={(e) =>
@@ -1509,11 +1704,12 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="municipio">
                     Município{" "}
                     <span className="text-destructive">*</span>
                   </label>
                   <input
+                    aria-labelledby="municipio"
                     type="text"
                     required
                     value={formData.municipio}
@@ -1527,11 +1723,12 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="uf">
                     UF{" "}
                     <span className="text-destructive">*</span>
                   </label>
                   <select
+                    aria-labelledby="uf"
                     required
                     value={formData.uf}
                     onChange={(e) =>
@@ -1573,10 +1770,11 @@ export default function CadastroProdutor() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="codigoMunicipio">
                     Código do Município
                   </label>
                   <input
+                    aria-labelledby="codigoMunicipio"
                     type="text"
                     value={formData.codigoMunicipio}
                     onChange={(e) =>
@@ -1589,10 +1787,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="cep">
                     CEP
                   </label>
                   <input
+                    aria-labelledby="cep"
                     type="text"
                     value={formData.cep}
                     onChange={(e) =>
@@ -1620,10 +1819,11 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="tipoLocalizacao">
                     Tipo de Localização
                   </label>
                   <select
+                    aria-labelledby="tipoLocalizacao"
                     value={formData.tipoLocalizacao}
                     onChange={(e) =>
                       setFormData({
@@ -1643,10 +1843,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div className="md:col-span-2">
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="especificacaoLocalizacao">
                     Especificação da Localização e KM
                   </label>
                   <input
+                    aria-labelledby="especificacaoLocalizacao"
                     type="text"
                     value={formData.especificacaoLocalizacao}
                     onChange={(e) =>
@@ -1661,10 +1862,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="km">
                     KM
                   </label>
                   <input
+                    aria-labelledby="km"
                     type="text"
                     value={formData.km}
                     onChange={(e) =>
@@ -1677,10 +1879,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="margem">
                     Margem
                   </label>
                   <select
+                    aria-labelledby="margem"
                     value={formData.margem}
                     onChange={(e) =>
                       setFormData({
@@ -1697,12 +1900,13 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div className="md:col-span-2 bg-accent/20 p-4 rounded-lg border border-border">
-                  <label className="block text-foreground mb-3 font-semibold">
+                  <label className="block text-foreground mb-3 font-semibold" id="tipoCoordenada">
                     Tipo de Coordenada
                   </label>
                   <div className="flex gap-4 mb-4">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
+                       aria-labelledby="tipoCoordenada"
                         type="radio"
                         value="decimal"
                         checked={formData.tipoCoordenada === "decimal"}
@@ -1718,6 +1922,7 @@ export default function CadastroProdutor() {
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
+                      aria-labelledby="tipoCoordenada"
                         type="radio"
                         value="geografica"
                         checked={formData.tipoCoordenada === "geografica"}
@@ -1736,10 +1941,11 @@ export default function CadastroProdutor() {
                   {formData.tipoCoordenada === "decimal" ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="latitudeDecimal">
                           Latitude (Decimal)
                         </label>
                         <input
+                            aria-labelledby="latitudeDecimal"
                           type="text"
                           value={formData.latitude}
                           onChange={(e) =>
@@ -1753,10 +1959,11 @@ export default function CadastroProdutor() {
                         />
                       </div>
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="longitudeDecimal">
                           Longitude (Decimal)
                         </label>
                         <input
+                          aria-labelledby="longitudeDecimal"
                           type="text"
                           value={formData.longitude}
                           onChange={(e) =>
@@ -1774,7 +1981,9 @@ export default function CadastroProdutor() {
                     <div className="space-y-4">
                       <div className="grid grid-cols-4 gap-3">
                         <div className="col-span-3">
-                          <label className="block text-foreground mb-2 text-sm">Latitude</label>
+                          <label className="block text-foreground mb-2 text-sm" id="latitudeGraus">
+                            Latitude
+                          </label>
                           <div className="grid grid-cols-3 gap-2">
                             <input
                               type="number"
@@ -1833,8 +2042,11 @@ export default function CadastroProdutor() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-foreground mb-2 text-sm">Direção</label>
+                          <label className="block text-foreground mb-2 text-sm" id="latitudeDirecao">
+                            Direção
+                          </label>
                           <select
+                              aria-labelledby="latitudeDirecao"
                             value={formData.latitudeDirecao}
                             onChange={(e) => {
                               const graus = formData.latitudeGraus || "0";
@@ -1858,7 +2070,9 @@ export default function CadastroProdutor() {
 
                       <div className="grid grid-cols-4 gap-3">
                         <div className="col-span-3">
-                          <label className="block text-foreground mb-2 text-sm">Longitude</label>
+                          <label className="block text-foreground mb-2 text-sm" id="longitudeGraus">
+                            Longitude
+                          </label>
                           <div className="grid grid-cols-3 gap-2">
                             <input
                               type="number"
@@ -1917,8 +2131,11 @@ export default function CadastroProdutor() {
                           </div>
                         </div>
                         <div>
-                          <label className="block text-foreground mb-2 text-sm">Direção</label>
+                          <label className="block text-foreground mb-2 text-sm" id="longitudeDirecao">
+                            Direção
+                          </label>
                           <select
+                            aria-labelledby="longitudeDirecao"
                             value={formData.longitudeDirecao}
                             onChange={(e) => {
                               const graus = formData.longitudeGraus || "0";
@@ -1977,10 +2194,11 @@ export default function CadastroProdutor() {
                   </div>
                 )}
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="comunidade">
                     Comunidade
                   </label>
                   <input
+                    aria-labelledby="comunidade"
                     type="text"
                     value={formData.comunidade}
                     onChange={(e) =>
@@ -2272,10 +2490,11 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div className="lg:col-span-3">
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="nomeImovel">
                     Nome do Imóvel
                   </label>
                   <input
+                    aria-labelledby="nomeImovel"
                     type="text"
                     value={formData.nomeImovel}
                     onChange={(e) =>
@@ -2288,10 +2507,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaTotal">
                     Área Total (ha)
                   </label>
                   <input
+                    aria-labelledby="areaTotal"
                     type="number"
                     step="0.01"
                     value={formData.areaTotal}
@@ -2305,10 +2525,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaEstado">
                     Área no Estado (ha)
                   </label>
                   <input
+                    aria-labelledby="areaEstado"
                     type="number"
                     step="0.01"
                     value={formData.areaEstado}
@@ -2322,10 +2543,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaOutroEstado">
                     Área em Outro Estado (ha)
                   </label>
                   <input
+                    aria-labelledby="areaOutroEstado"
                     type="number"
                     step="0.01"
                     value={formData.areaOutroEstado}
@@ -2339,10 +2561,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaAgricultura">
                     Área com Agricultura (ha)
                   </label>
                   <input
+                    aria-labelledby="areaAgricultura"
                     type="number"
                     step="0.01"
                     value={formData.areaAgricultura}
@@ -2356,10 +2579,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaPastagem">
                     Área de Pastagem (ha)
                   </label>
                   <input
+                    aria-labelledby="areaPastagem"
                     type="number"
                     step="0.01"
                     value={formData.areaPastagem}
@@ -2373,10 +2597,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaArrendada">
                     Área Arrendada (ha)
                   </label>
                   <input
+                    aria-labelledby="areaArrendada"
                     type="number"
                     step="0.01"
                     value={formData.areaArrendada}
@@ -2390,10 +2615,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="areaParceria">
                     Área em Parceria (ha)
                   </label>
                   <input
+                    aria-labelledby="areaParceria"
                     type="number"
                     step="0.01"
                     value={formData.areaParceria}
@@ -2419,10 +2645,11 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="atividadePrincipal">
                     Atividade Principal
                   </label>
                   <input
+                    aria-labelledby="atividadePrincipal"
                     type="text"
                     value={formData.atividadePrincipal}
                     onChange={(e) =>
@@ -2435,10 +2662,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="atividadeSecundaria">
                     Atividade Secundária
                   </label>
                   <input
+                    aria-labelledby="atividadeSecundaria"
                     type="text"
                     value={formData.atividadeSecundaria}
                     onChange={(e) =>
@@ -2510,10 +2738,11 @@ export default function CadastroProdutor() {
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                     <div>
-                      <label className="block text-foreground mb-2">
+                      <label className="block text-foreground mb-2" id="rgPesca">
                         Registro Geral da Pesca
                       </label>
                       <input
+                        aria-labelledby="rgPesca"
                         type="text"
                         value={formData.rgPesca}
                         onChange={(e) =>
@@ -2527,10 +2756,11 @@ export default function CadastroProdutor() {
                     </div>
 
                     <div>
-                      <label className="block text-foreground mb-2">
+                      <label className="block text-foreground mb-2" id="protocoloRgp">
                         Protocolo RGP
                       </label>
                       <input
+                        aria-labelledby="protocoloRgp"
                         type="text"
                         value={formData.protocoloRgp}
                         onChange={(e) =>
@@ -2544,10 +2774,11 @@ export default function CadastroProdutor() {
                     </div>
 
                     <div>
-                      <label className="block text-foreground mb-2">
+                      <label className="block text-foreground mb-2" id="localPesca">
                         Local
                       </label>
                       <select
+                        aria-labelledby="localPesca"
                         value={formData.localPesca}
                         onChange={(e) =>
                           setFormData({
@@ -2566,10 +2797,11 @@ export default function CadastroProdutor() {
                     </div>
 
                     <div>
-                      <label className="block text-foreground mb-2">
+                      <label className="block text-foreground mb-2" id="margemPesca">
                         Margem
                       </label>
                       <select
+                        aria-labelledby="margemPesca"
                         value={formData.margemPesca}
                         onChange={(e) =>
                           setFormData({
@@ -2586,10 +2818,11 @@ export default function CadastroProdutor() {
                     </div>
 
                     <div>
-                      <label className="block text-foreground mb-2">
+                      <label className="block text-foreground mb-2" id="producaoTotal">
                         Produção Total (KG)
                       </label>
                       <input
+                        aria-labelledby="producaoTotal"
                         type="number"
                         step="0.01"
                         value={formData.producaoTotal}
@@ -2792,10 +3025,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div className="rounded-xl border border-border bg-muted/20 p-4">
-                  <label className="block mb-2 text-sm font-medium text-foreground">
+                  <label className="block mb-2 text-sm font-medium text-foreground" id="sistemaCriacao">
                     Sistema de Criação
                   </label>
                   <select
+                    aria-labelledby="sistemaCriacao"
                     value={formData.sistemaCriacao || ""}
                     onChange={(e) =>
                       setFormData({
@@ -2867,11 +3101,12 @@ export default function CadastroProdutor() {
                   </div>
 
                   <div>
-                    <label className="block text-foreground mb-2 flex items-center gap-2">
+                    <label className="block text-foreground mb-2 flex items-center gap-2" id="areaPiscicultura">
                       Área da Piscicultura
                       <Badge className="bg-emerald-600 text-white hover:bg-emerald-700">há</Badge>
                     </label>
                     <input
+                      aria-labelledby="areaPiscicultura"
                       type="number"
                       value={formData.areaPiscicultura}
                       onChange={(e) =>
@@ -2885,10 +3120,11 @@ export default function CadastroProdutor() {
                   </div>
 
                   <div>
-                    <label className="block text-foreground mb-2">
+                    <label className="block text-foreground mb-2" id="numeroPeixes">
                       Número de Peixes
                     </label>
                     <input
+                      aria-labelledby="numeroPeixes"
                       type="number"
                       value={formData.numeroPeixes}
                       onChange={(e) =>
@@ -2902,10 +3138,11 @@ export default function CadastroProdutor() {
                   </div>
 
                   <div>
-                    <label className="block text-foreground mb-2">
+                    <label className="block text-foreground mb-2" id="producaoPiscicultura">
                       Produção (KG)
                     </label>
                     <input
+                      aria-labelledby="producaoPiscicultura"
                       type="number"
                       value={formData.producaoPiscicultura}
                       onChange={(e) =>
@@ -2975,10 +3212,11 @@ export default function CadastroProdutor() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div className="space-y-2">
-                          <label className="text-sm font-medium text-foreground">
+                          <label className="text-sm font-medium text-foreground" id="tipoAbelha">
                             Tipo de Abelha
                           </label>
                           <select
+                            aria-labelledby="tipoAbelha"
                             value={abelha.tipo}
                             onChange={(e) => {
                               const novaLista = [
@@ -3132,6 +3370,7 @@ export default function CadastroProdutor() {
                                 abelhas: novaLista,
                               });
                             }}
+                            aria-label="Produção de Própolis (KG)"
                             className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                           />
                         </div>
@@ -3229,6 +3468,7 @@ export default function CadastroProdutor() {
 
                           <div className="flex gap-2">
                             <select
+                              aria-label="Unidade de medida"
                               value={item.unidade}
                               onChange={(e) => {
                                 const novaLista = [
@@ -3336,10 +3576,11 @@ export default function CadastroProdutor() {
                   {formData.possuiSistemaAgroflorestal && (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="numeroPlantasAcai">
                           Nº de plantas de açaí
                         </label>
                         <input
+                          aria-labelledby="numeroPlantasAcai"
                           type="number"
                           value={formData.numeroPlantasAcai}
                           onChange={(e) =>
@@ -3353,10 +3594,11 @@ export default function CadastroProdutor() {
                       </div>
 
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="numeroPlantasBanana">
                           Nº de plantas de banana
                         </label>
                         <input
+                          aria-labelledby="numeroPlantasBanana"
                           type="number"
                           value={formData.numeroPlantasBanana}
                           onChange={(e) =>
@@ -3371,10 +3613,11 @@ export default function CadastroProdutor() {
                       </div>
 
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="numeroPlantasCastanha">
                           Nº de plantas de castanha-do-brasil
                         </label>
                         <input
+                          aria-labelledby="numeroPlantasCastanha"
                           type="number"
                           value={formData.numeroPlantasCastanha}
                           onChange={(e) =>
@@ -3389,10 +3632,11 @@ export default function CadastroProdutor() {
                       </div>
 
                       <div>
-                        <label className="block text-foreground mb-2">
+                        <label className="block text-foreground mb-2" id="numeroPlantasCacau">
                           Nº de plantas de cacau
                         </label>
                         <input
+                          aria-labelledby="numeroPlantasCacau"
                           type="number"
                           value={formData.numeroPlantasCacau}
                           onChange={(e) =>
@@ -3686,10 +3930,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="CodigoPR">
                     Código PR 
                   </label>
                   <input
+                    aria-labelledby="CodigoPR"
                     type="text"
                     value={formData.codigoUnloc}
                     onChange={(e) =>
@@ -3703,10 +3948,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="CodigoRGP">
                     Código RGP
                   </label>
                   <input
+                    aria-labelledby="CodigoRGP"
                     type="text"
                     value={formData.codigoRgp}
                     onChange={(e) =>
@@ -3720,10 +3966,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="municipioUf">
                     Município-UF
                   </label>
                   <input
+                    aria-labelledby="municipioUf"
                     type="text"
                     value={formData.municipioUf}
                     onChange={(e) =>
@@ -3737,10 +3984,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="dataRegistro">
                     Data
                   </label>
                   <input
+                    aria-labelledby="dataRegistro"
                     type="date"
                     value={formData.dataRegistro}
                     onChange={(e) =>
@@ -3754,10 +4002,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="tipoSolicitacao">
                     Tipo de Solicitação
                   </label>
                   <select
+                    aria-labelledby="tipoSolicitacao"
                     value={formData.tipoSolicitacao}
                     onChange={(e) =>
                       setFormData({
@@ -3857,10 +4106,11 @@ export default function CadastroProdutor() {
                     {formData.possuiCaf && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="numeroCaf">
                             Número do CAF
                           </label>
                           <input
+                            aria-labelledby="numeroCaf"
                             type="text"
                             value={formData.numeroCaf}
                             onChange={(e) =>
@@ -3874,10 +4124,11 @@ export default function CadastroProdutor() {
                         </div>
 
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="vencimentoCaf">
                             Data de Vencimento do CAF
                           </label>
                           <input
+                            aria-labelledby="vencimentoCaf"
                             type="date"
                             value={formData.vencimentoCaf}
                             onChange={(e) =>
@@ -3921,10 +4172,11 @@ export default function CadastroProdutor() {
                     {formData.possuiCar && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="numeroCar">
                             Número do CAR
                           </label>
                           <input
+                            aria-labelledby="numeroCar"
                             type="text"
                             value={formData.numeroCar}
                             onChange={(e) =>
@@ -3938,10 +4190,11 @@ export default function CadastroProdutor() {
                         </div>
 
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="dataInscricaoCar">
                             Data de Inscrição do CAR
                           </label>
                           <input
+                            aria-labelledby="dataInscricaoCar"
                             type="date"
                             value={formData.dataInscricaoCar}
                             onChange={(e) =>
@@ -3992,10 +4245,11 @@ export default function CadastroProdutor() {
                     {formData.possuiCarteiraProdutor && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="numeroCarteiraProdutor">
                             Número da Carteira do Produtor
                           </label>
                           <input
+                            aria-labelledby="numeroCarteiraProdutor"
                             type="text"
                             value={
                               formData.numeroCarteiraProdutor
@@ -4012,10 +4266,11 @@ export default function CadastroProdutor() {
                         </div>
 
                         <div>
-                          <label className="block text-foreground mb-2">
+                          <label className="block text-foreground mb-2" id="vencimentoCarteiraProdutor">
                             Data de Vencimento da Carteira
                           </label>
                           <input
+                            aria-labelledby="vencimentoCarteiraProdutor"
                             type="date"
                             value={
                               formData.vencimentoCarteiraProdutor
@@ -4054,10 +4309,11 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="tecnicoResponsavel">
                     Técnico Responsável
                   </label>
                   <input
+                    aria-labelledby="tecnicoResponsavel"
                     type="text"
                     value={formData.tecnicoResponsavel}
                     onChange={(e) =>
@@ -4070,10 +4326,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="numeroConselho">
                     Número do Conselho
                   </label>
                   <input
+                    aria-labelledby="numeroConselho"
                     type="text"
                     value={formData.numeroConselho}
                     onChange={(e) =>
@@ -4086,10 +4343,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="gerente">
                     Gerente
                   </label>
                   <input
+                    aria-labelledby="gerente"
                     type="text"
                     value={formData.gerente}
                     onChange={(e) =>
@@ -4102,10 +4360,11 @@ export default function CadastroProdutor() {
                   />
                 </div>
                 <div>
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="conselhoGerente">
                     Conselho do Gerente
                   </label>
                   <input
+                    aria-labelledby="conselhoGerente"
                     type="text"
                     value={formData.conselhoGerente}
                     onChange={(e) =>
@@ -4138,6 +4397,7 @@ export default function CadastroProdutor() {
                 </div>
 
                 <input
+                  aria-label="Anexar Documentos do Produtor"
                   type="file"
                   multiple
                   onChange={handleFileUpload}
@@ -4179,10 +4439,11 @@ export default function CadastroProdutor() {
                 </div>
 
                 <div className="mt-6">
-                  <label className="block text-foreground mb-2">
+                  <label className="block text-foreground mb-2" id="observacoesGerais">
                     Observações Gerais
                   </label>
                   <textarea
+                    aria-labelledby="observacoesGerais"
                     rows={5}
                     value={formData.observacoes}
                     onChange={(e) =>
@@ -4197,10 +4458,11 @@ export default function CadastroProdutor() {
               </div>
 
               <div>
-                <label className="block text-foreground mb-2">
+                <label className="block text-foreground mb-2" id="informacoesAdicionais">
                   Informações Adicionais
                 </label>
                 <textarea
+                  aria-labelledby="informacoesAdicionais"
                   rows={8}
                   value={formData.observacoes}
                   onChange={(e) =>
