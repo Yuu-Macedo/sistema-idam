@@ -77,7 +77,7 @@ export default function SeletorAtividades({
 
   const todasAtividadesLista = () => {
     const lista: string[] = [];
-    Object.values(ATIVIDADES_DISPONIVEIS).forEach((categoria) => {
+    Object.entries(ATIVIDADES_DISPONIVEIS).forEach(([, categoria]) => {
       Object.values(categoria.subtipos).forEach(subtipos => {
         lista.push(...subtipos);
       });
@@ -90,10 +90,11 @@ export default function SeletorAtividades({
       {/* SELEÇÃO PRINCIPAL E SECUNDÁRIA */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">
+          <label htmlFor="atividade-principal" className="block text-sm font-semibold text-foreground mb-2">
             Atividade Principal <span className="text-red-500">*</span>
           </label>
           <select
+            id="atividade-principal"
             required
             value={atividadePrincipal}
             onChange={(e) => {
@@ -112,10 +113,11 @@ export default function SeletorAtividades({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-foreground mb-2">
+          <label htmlFor="atividade-secundaria" className="block text-sm font-semibold text-foreground mb-2">
             Atividade Secundária <span className="text-muted-foreground text-xs">(Opcional)</span>
           </label>
           <select
+            id="atividade-secundaria"
             value={atividadeSecundaria}
             onChange={(e) => {
               onChangeSecundaria(e.target.value);
@@ -137,7 +139,7 @@ export default function SeletorAtividades({
 
       {/* RESUMO DAS ATIVIDADES SELECIONADAS */}
       {(atividadePrincipal || atividadeSecundaria) && (
-        <div className="bg-linear-to-r from-emerald-50 to-teal-50 border-2 border-emerald-500 p-5 rounded-lg animate-in fade-in slide-in-from-top-2 duration-500">
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-500 p-5 rounded-lg animate-in fade-in slide-in-from-top-2 duration-500">
           <div className="flex items-start gap-3">
             <Sprout className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
             <div className="flex-1">

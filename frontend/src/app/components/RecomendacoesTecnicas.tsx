@@ -177,14 +177,22 @@ export default function RecomendacoesTecnicas() {
             Produtor: {produtorSelecionado.nome}
           </h2>
 
+          <label htmlFor="tecnico-responsavel" className="block text-sm font-medium mb-2">
+            Técnico responsável
+          </label>
           <input
+            id="tecnico-responsavel"
             type="text"
             value={formData.tecnicoResponsavel}
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100"
           />
 
+          <label htmlFor="recomendacao-textarea" className="block text-sm font-medium mb-2">
+            Recomendação técnica
+          </label>
           <textarea
+            id="recomendacao-textarea"
             placeholder="Digite a recomendação técnica..."
             value={formData.recomendacao}
             onChange={(e) =>

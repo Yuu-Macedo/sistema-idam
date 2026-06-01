@@ -76,6 +76,33 @@ const CORES = [
   "#d35400",
 ];
 
+const getCorVisitaClass = (cor: string) => {
+  switch (cor) {
+    case "#2d6a3e":
+      return "bg-emerald-700";
+    case "#4a90e2":
+      return "bg-sky-600";
+    case "#e27a4a":
+      return "bg-orange-500";
+    case "#9b59b6":
+      return "bg-violet-600";
+    case "#e74c3c":
+      return "bg-red-600";
+    case "#16a085":
+      return "bg-teal-600";
+    case "#f39c12":
+      return "bg-amber-500";
+    case "#8e44ad":
+      return "bg-fuchsia-600";
+    case "#27ae60":
+      return "bg-emerald-600";
+    case "#d35400":
+      return "bg-orange-600";
+    default:
+      return "bg-slate-600";
+  }
+};
+
 export default function CronogramaVisitas() {
   const [visitas, setVisitas] = useState<Visita[]>(() => {
     const visitasStorage =
@@ -396,10 +423,11 @@ export default function CronogramaVisitas() {
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             <div>
-              <label className="block text-foreground mb-2">
+              <label htmlFor="produtor-id" className="block text-foreground mb-2">
                 Produtor <span className="text-muted-foreground text-sm">(Opcional)</span>
               </label>
               <select
+                id="produtor-id"
                 value={formData.produtorId}
                 onChange={(e) =>
                   setFormData({
@@ -419,11 +447,11 @@ export default function CronogramaVisitas() {
             </div>
 
             <div>
-              <label className="block text-foreground mb-2">
-                Técnico Responsável{" "}
-                <span className="text-destructive">*</span>
+              <label htmlFor="tecnico-id" className="block text-foreground mb-2">
+                Técnico Responsável <span className="text-destructive">*</span>
               </label>
               <select
+                id="tecnico-id"
                 required
                 value={formData.tecnico}
                 onChange={(e) =>
@@ -444,11 +472,11 @@ export default function CronogramaVisitas() {
             </div>
 
             <div>
-              <label className="block text-foreground mb-2">
-                Dia da Semana{" "}
-                <span className="text-destructive">*</span>
+              <label htmlFor="dia-semana-id" className="block text-foreground mb-2">
+                Dia da Semana <span className="text-destructive">*</span>
               </label>
               <select
+                id="dia-semana-id"
                 required
                 value={formData.diaSemana}
                 onChange={(e) =>
@@ -468,11 +496,11 @@ export default function CronogramaVisitas() {
             </div>
 
             <div>
-              <label className="block text-foreground mb-2">
-                Turno{" "}
-                <span className="text-destructive">*</span>
+              <label htmlFor="turno-id" className="block text-foreground mb-2">
+                Turno <span className="text-destructive">*</span>
               </label>
               <select
+                id="turno-id"
                 required
                 value={formData.turno}
                 onChange={(e) =>
@@ -493,13 +521,14 @@ export default function CronogramaVisitas() {
             {(formData.turno === "manha" || formData.turno === "ambos") && (
               <>
                 <div>
-                  <label className="block text-foreground mb-2">
-                    Horário Saída (Manhã){" "}
-                    <span className="text-destructive">*</span>
+                  <label htmlFor="horario-saida-manha-id" className="block text-foreground mb-2">
+                    Horário Saída (Manhã) <span className="text-destructive">*</span>
                   </label>
                   <input
+                    id="horario-saida-manha-id"
                     type="time"
                     required
+                    placeholder="08:00"
                     value={formData.horarioSaidaManha}
                     onChange={(e) =>
                       setFormData({
@@ -515,13 +544,14 @@ export default function CronogramaVisitas() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
-                    Horário Entrada (Manhã){" "}
-                    <span className="text-destructive">*</span>
+                  <label htmlFor="horario-entrada-manha-id" className="block text-foreground mb-2">
+                    Horário Entrada (Manhã) <span className="text-destructive">*</span>
                   </label>
                   <input
+                    id="horario-entrada-manha-id"
                     type="time"
                     required
+                    placeholder="12:00"
                     value={formData.horarioEntradaManha}
                     onChange={(e) =>
                       setFormData({
@@ -539,13 +569,14 @@ export default function CronogramaVisitas() {
             {(formData.turno === "tarde" || formData.turno === "ambos") && (
               <>
                 <div>
-                  <label className="block text-foreground mb-2">
-                    Horário Saída (Tarde){" "}
-                    <span className="text-destructive">*</span>
+                  <label htmlFor="horario-saida-tarde-id" className="block text-foreground mb-2">
+                    Horário Saída (Tarde) <span className="text-destructive">*</span>
                   </label>
                   <input
+                    id="horario-saida-tarde-id"
                     type="time"
                     required
+                    placeholder="13:00"
                     value={formData.horarioSaidaTarde}
                     onChange={(e) =>
                       setFormData({
@@ -561,13 +592,14 @@ export default function CronogramaVisitas() {
                 </div>
 
                 <div>
-                  <label className="block text-foreground mb-2">
-                    Horário Entrada (Tarde){" "}
-                    <span className="text-destructive">*</span>
+                  <label htmlFor="horario-entrada-tarde-id" className="block text-foreground mb-2">
+                    Horário Entrada (Tarde) <span className="text-destructive">*</span>
                   </label>
                   <input
+                    id="horario-entrada-tarde-id"
                     type="time"
                     required
+                    placeholder="17:00"
                     value={formData.horarioEntradaTarde}
                     onChange={(e) =>
                       setFormData({
@@ -582,11 +614,11 @@ export default function CronogramaVisitas() {
             )}
 
             <div>
-              <label className="block text-foreground mb-2">
-                Atividade{" "}
-                <span className="text-destructive">*</span>
+              <label htmlFor="atividade-id" className="block text-foreground mb-2">
+                Atividade <span className="text-destructive">*</span>
               </label>
               <input
+                id="atividade-id"
                 type="text"
                 required
                 value={formData.atividade}
@@ -602,10 +634,11 @@ export default function CronogramaVisitas() {
             </div>
 
             <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-foreground mb-2">
+              <label htmlFor="observacoes-id" className="block text-foreground mb-2">
                 Observações
               </label>
               <textarea
+                id="observacoes-id"
                 value={formData.observacoes}
                 onChange={(e) =>
                   setFormData({
@@ -620,10 +653,11 @@ export default function CronogramaVisitas() {
             </div>
 
             <div className="md:col-span-2 lg:col-span-3">
-              <label className="block text-foreground mb-2">
+              <label htmlFor="recomendacoes-id" className="block text-foreground mb-2">
                 Recomendações
               </label>
               <textarea
+                id="recomendacoes-id"
                 value={formData.recomendacoes}
                 onChange={(e) =>
                   setFormData({
@@ -680,8 +714,7 @@ export default function CronogramaVisitas() {
             <thead>
               <tr className="bg-gray-100">
                 <th
-                  className="border border-gray-300 p-2 text-left text-sm font-semibold"
-                  style={{ width: "80px" }}
+                  className="border border-gray-300 p-2 text-left text-sm font-semibold w-[80px]"
                 >
                   Período
                 </th>
@@ -704,18 +737,14 @@ export default function CronogramaVisitas() {
                 {DIAS_SEMANA.map((dia) => (
                   <td
                     key={dia.key}
-                    className="border border-gray-300 p-2 align-top"
-                    style={{ minWidth: "150px" }}
+                    className="border border-gray-300 p-2 align-top min-w-[150px]"
                   >
                     <div className="space-y-2">
                       {getVisitasDoDia(dia.key, "manha").map(
                         (visita) => (
                           <div
                             key={visita.id}
-                            className="p-2 rounded text-white text-xs group relative print:break-inside-avoid"
-                            style={{
-                              backgroundColor: visita.cor,
-                            }}
+                            className={`p-2 rounded text-white text-xs group relative print:break-inside-avoid ${getCorVisitaClass(visita.cor)}`}
                           >
                             <div className="font-semibold">
                               {visita.horarioSaidaManha && visita.horarioEntradaManha
@@ -740,6 +769,8 @@ export default function CronogramaVisitas() {
                             {/* Botões de ação (não aparecem na impressão) */}
                             <div className="absolute top-1 right-1 hidden group-hover:flex gap-1 print:hidden">
                               <button
+                                type="button"
+                                aria-label="Editar visita de manhã"
                                 onClick={() =>
                                   handleEditar(visita)
                                 }
@@ -748,6 +779,8 @@ export default function CronogramaVisitas() {
                                 <Edit2 className="w-3 h-3" />
                               </button>
                               <button
+                                type="button"
+                                aria-label="Excluir visita de manhã"
                                 onClick={() =>
                                   handleExcluir(visita.id)
                                 }
@@ -772,18 +805,14 @@ export default function CronogramaVisitas() {
                 {DIAS_SEMANA.map((dia) => (
                   <td
                     key={dia.key}
-                    className="border border-gray-300 p-2 align-top"
-                    style={{ minWidth: "150px" }}
+                    className="border border-gray-300 p-2 align-top min-w-[150px]"
                   >
                     <div className="space-y-2">
                       {getVisitasDoDia(dia.key, "tarde").map(
                         (visita) => (
                           <div
                             key={visita.id}
-                            className="p-2 rounded text-white text-xs group relative print:break-inside-avoid"
-                            style={{
-                              backgroundColor: visita.cor,
-                            }}
+                            className={`p-2 rounded text-white text-xs group relative print:break-inside-avoid ${getCorVisitaClass(visita.cor)}`}
                           >
                             <div className="font-semibold">
                               {visita.horarioSaidaTarde && visita.horarioEntradaTarde
@@ -808,6 +837,8 @@ export default function CronogramaVisitas() {
                             {/* Botões de ação (não aparecem na impressão) */}
                             <div className="absolute top-1 right-1 hidden group-hover:flex gap-1 print:hidden">
                               <button
+                                type="button"
+                                aria-label="Editar visita da tarde"
                                 onClick={() =>
                                   handleEditar(visita)
                                 }
@@ -816,6 +847,8 @@ export default function CronogramaVisitas() {
                                 <Edit2 className="w-3 h-3" />
                               </button>
                               <button
+                                type="button"
+                                aria-label="Excluir visita da tarde"
                                 onClick={() =>
                                   handleExcluir(visita.id)
                                 }

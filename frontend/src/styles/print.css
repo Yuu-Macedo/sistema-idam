@@ -62,8 +62,7 @@
 
   /* Melhorar legibilidade */
   p, li {
-    orphans: 3;
-    widows: 3;
+    line-height: 1.4;
   }
 
   /* Garantir que bordas sejam impressas */
@@ -103,8 +102,6 @@
   [style*="background-color"] {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
-    print-color-adjust: exact !important;
-    -webkit-print-color-adjust: exact !important;
   }
 
   /* Mostrar elementos marcados para impressão */

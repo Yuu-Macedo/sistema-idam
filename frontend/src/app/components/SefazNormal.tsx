@@ -1,12 +1,13 @@
 interface ProdutorData {
-  [key: string]: any;
+  [key: string]: unknown;
+  atividades?: unknown;
 }
 
 interface Props {
   produtor: ProdutorData;
 }
 
-function valor(v: any) {
+function valor(v: unknown) {
   if (v === null || v === undefined || v === "") return "";
   return String(v);
 }
@@ -15,17 +16,17 @@ function marcar(condicao: boolean) {
   return condicao ? "X" : "";
 }
 
-function formatDateBR(value?: string) {
-  if (!value) return "____/____/______";
+function formatDateBR(value?: unknown) {
+  if (!value || typeof value !== "string") return "____/____/______";
   const data = new Date(value);
   if (isNaN(data.getTime())) return value;
   return data.toLocaleDateString("pt-BR");
 }
 
-function categoriasAtividades(produtor: any) {
+function categoriasAtividades(produtor: ProdutorData) {
   if (!Array.isArray(produtor.atividades)) return [];
   return produtor.atividades
-    .map((item: any) => String(item?.categoria || "").toLowerCase())
+    .map((item) => String((item as Record<string, unknown>)?.categoria || "").toLowerCase())
     .filter(Boolean);
 }
 
@@ -37,6 +38,8 @@ export default function SefazNormal({ produtor }: Props) {
   const condicaoAcesso = String(
     produtor.tipoLocalizacao || "",
   ).toLowerCase();
+  const observacoesTexto =
+    typeof produtor.observacoes === "string" ? produtor.observacoes : "";
 
   return (
     <>
@@ -86,15 +89,7 @@ export default function SefazNormal({ produtor }: Props) {
         }
       `}</style>
       <div
-        className="bg-white text-[#127a35] mx-auto border border-[#127a35] impressao-sefaz"
-        style={{
-          width: "794px",
-          minHeight: "1123px",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "9px",
-          lineHeight: 1.1,
-          padding: "10px",
-        }}
+        className="bg-white text-[#127a35] mx-auto border border-[#127a35] impressao-sefaz w-[794px] min-h-[1123px] font-[Arial,_sans-serif] text-[9px] leading-[1.1] p-[10px]"
       >
       {/* Topo */}
       <div className="border border-[#127a35]">
@@ -430,15 +425,17 @@ export default function SefazNormal({ produtor }: Props) {
 
       {/* área */}
       <div className="grid grid-cols-7 border-x border-b border-[#127a35] text-center">
-        {[
-          ["24 Área Total do Imóvel", produtor.areaTotal],
-          ["25 Área em Outro Estado", produtor.areaOutroEstado],
-          ["26 Área no Estado", produtor.areaEstado],
-          ["27 Área Explorada com Culturas", produtor.areaAgricultura],
-          ["28 Área de Pastagem", produtor.areaPastagem],
-          ["29 Área Arrendada", produtor.areaArrendada],
-          ["30 Área Explorada em Parceria", produtor.areaParceria],
-        ].map(([label, value], index) => (
+        {(
+          [
+            ["24 Área Total do Imóvel", produtor.areaTotal],
+            ["25 Área em Outro Estado", produtor.areaOutroEstado],
+            ["26 Área no Estado", produtor.areaEstado],
+            ["27 Área Explorada com Culturas", produtor.areaAgricultura],
+            ["28 Área de Pastagem", produtor.areaPastagem],
+            ["29 Área Arrendada", produtor.areaArrendada],
+            ["30 Área Explorada em Parceria", produtor.areaParceria],
+          ] as [string, unknown][]
+        ).map(([label, value], index) => (
           <div
             key={label}
             className={`p-1 ${
@@ -555,9 +552,9 @@ export default function SefazNormal({ produtor }: Props) {
             </div>
           </div>
 
-          {produtor.observacoes && (
+          {observacoesTexto && (
             <div className="text-black mt-3 whitespace-pre-wrap">
-              {valor(produtor.observacoes)}
+              {valor(observacoesTexto)}
             </div>
           )}
         </div>

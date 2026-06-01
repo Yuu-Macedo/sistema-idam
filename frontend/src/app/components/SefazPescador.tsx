@@ -1,12 +1,14 @@
 interface ProdutorData {
-  [key: string]: any;
+  [key: string]: unknown;
+  atividades?: unknown;
+  especies?: unknown;
 }
 
 interface Props {
   produtor: ProdutorData;
 }
 
-function valor(v: any) {
+function valor(v: unknown) {
   if (v === null || v === undefined || v === "") return "";
   return String(v);
 }
@@ -15,29 +17,32 @@ function marcar(condicao: boolean) {
   return condicao ? "X" : "";
 }
 
-function formatDateBR(value?: string) {
-  if (!value) return "____/____/______";
+function formatDateBR(value?: unknown) {
+  if (!value || typeof value !== "string") return "____/____/______";
   const data = new Date(value);
   if (isNaN(data.getTime())) return value;
   return data.toLocaleDateString("pt-BR");
 }
 
-function categoriasAtividades(produtor: any) {
+function categoriasAtividades(produtor: ProdutorData) {
   if (!Array.isArray(produtor.atividades)) return [];
   return produtor.atividades
-    .map((item: any) => String(item?.categoria || "").toLowerCase())
+    .map((item) => String((item as Record<string, unknown>)?.categoria || "").toLowerCase())
     .filter(Boolean);
 }
 
-function especiesResumo(especies: any[]) {
+function especiesResumo(especies: unknown[]) {
   if (!Array.isArray(especies) || especies.length === 0) return "";
   return especies
-    .filter((e) => e?.nome || e?.kg)
-    .map((e) => `${e.kg || "0"} kg de ${e.nome || ""}`)
+    .filter((e) => typeof e === "object" && e !== null && ((e as Record<string, unknown>).nome || (e as Record<string, unknown>).kg))
+    .map((e) => {
+      const item = e as Record<string, unknown>;
+      return `${valor(item.kg) || "0"} kg de ${valor(item.nome)}`;
+    })
     .join(", ");
 }
 
-function subsistencia(produtor: any) {
+function subsistencia(produtor: ProdutorData) {
   const itens: string[] = [];
 
   if (produtor.possuiAgriculturaSubtipo) itens.push("Agricultura");
@@ -50,9 +55,9 @@ function subsistencia(produtor: any) {
 
 export default function SefazPescador({ produtor }: Props) {
   const atividades = categoriasAtividades(produtor);
-  const situacaoImovel = String(produtor.situacaoImovel || "").toLowerCase();
-  const condicaoAcesso = String(produtor.tipoLocalizacao || "").toLowerCase();
-  const especies = especiesResumo(produtor.especies || []);
+  const situacaoImovel = typeof produtor.situacaoImovel === "string" ? produtor.situacaoImovel.toLowerCase() : "";
+  const condicaoAcesso = typeof produtor.tipoLocalizacao === "string" ? produtor.tipoLocalizacao.toLowerCase() : "";
+  const especies = especiesResumo(Array.isArray(produtor.especies) ? produtor.especies : []);
   const prodTotal = valor(produtor.producaoTotal);
   const subs = subsistencia(produtor);
 
@@ -104,15 +109,7 @@ export default function SefazPescador({ produtor }: Props) {
         }
       `}</style>
       <div
-        className="bg-white text-[#127a35] mx-auto border border-[#127a35] impressao-sefaz-pescador"
-        style={{
-          width: "794px",
-          minHeight: "1123px",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "9px",
-          lineHeight: 1.1,
-          padding: "10px",
-        }}
+        className="bg-white text-[#127a35] mx-auto border border-[#127a35] impressao-sefaz-pescador w-[794px] min-h-[1123px] font-[Arial,_sans-serif] text-[9px] leading-[1.1] p-[10px]"
       >
       {/* Topo */}
       <div className="border border-[#127a35]">
@@ -149,25 +146,37 @@ export default function SefazPescador({ produtor }: Props) {
             <div className="flex items-center gap-2">
               <span>Inscrição</span>
               <div className="w-6 h-4 border border-[#127a35] text-center">
-                {marcar((produtor.tipoSolicitacao || "").toLowerCase() === "inscrição")}
+                {marcar(
+                  (typeof produtor.tipoSolicitacao === "string" ? produtor.tipoSolicitacao : "").toLowerCase() ===
+                    "inscrição",
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span>Baixa</span>
               <div className="w-6 h-4 border border-[#127a35] text-center">
-                {marcar((produtor.tipoSolicitacao || "").toLowerCase() === "baixa")}
+                {marcar(
+                  (typeof produtor.tipoSolicitacao === "string" ? produtor.tipoSolicitacao : "").toLowerCase() ===
+                    "baixa",
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span>Alteração</span>
               <div className="w-6 h-4 border border-[#127a35] text-center">
-                {marcar((produtor.tipoSolicitacao || "").toLowerCase() === "alteração")}
+                {marcar(
+                  (typeof produtor.tipoSolicitacao === "string" ? produtor.tipoSolicitacao : "").toLowerCase() ===
+                    "alteração",
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span>2ª Via</span>
               <div className="w-6 h-4 border border-[#127a35] text-center">
-                {marcar((produtor.tipoSolicitacao || "").toLowerCase() === "2ª via")}
+                {marcar(
+                  (typeof produtor.tipoSolicitacao === "string" ? produtor.tipoSolicitacao : "").toLowerCase() ===
+                    "2ª via",
+                )}
               </div>
             </div>
           </div>
@@ -347,15 +356,17 @@ export default function SefazPescador({ produtor }: Props) {
 
       {/* área */}
       <div className="grid grid-cols-7 border-x border-b border-[#127a35] text-center">
-        {[
-          ["24 Área Total do Imóvel", produtor.areaTotal],
-          ["25 Área em Outro Estado", produtor.areaOutroEstado],
-          ["26 Área no Estado", produtor.areaEstado],
-          ["27 Área Explorada com Culturas", produtor.areaAgricultura],
-          ["28 Área de Pastagem", produtor.areaPastagem],
-          ["29 Área Arrendada", produtor.areaArrendada],
-          ["30 Área Explorada em Parceria", produtor.areaParceria],
-        ].map(([label, value], index) => (
+        {(
+          [
+            ["24 Área Total do Imóvel", produtor.areaTotal],
+            ["25 Área em Outro Estado", produtor.areaOutroEstado],
+            ["26 Área no Estado", produtor.areaEstado],
+            ["27 Área Explorada com Culturas", produtor.areaAgricultura],
+            ["28 Área de Pastagem", produtor.areaPastagem],
+            ["29 Área Arrendada", produtor.areaArrendada],
+            ["30 Área Explorada em Parceria", produtor.areaParceria],
+          ] as [string, unknown][]
+        ).map(([label, value], index) => (
           <div
             key={label}
             className={`p-1 ${index < 6 ? "border-r border-[#127a35]" : ""}`}

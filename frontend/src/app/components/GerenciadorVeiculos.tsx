@@ -386,18 +386,17 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
                 <span className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-semibold ${getStatusLabelColor(veiculoEmUsoDoTecnico.status)}`}>{veiculoEmUsoDoTecnico.status}</span>
                 <div className="mt-4">
                   <p className="text-sm font-semibold text-slate-700">Gasolina</p>
-                  <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className={`h-full rounded-full ${
-                        veiculoEmUsoDoTecnico.gasolina <= 20
-                          ? "bg-red-500"
-                          : veiculoEmUsoDoTecnico.gasolina <= 50
-                          ? "bg-amber-500"
-                          : "bg-emerald-500"
-                      }`}
-                      style={{ width: `${veiculoEmUsoDoTecnico.gasolina}%` }}
-                    />
-                  </div>
+                  <progress
+                    value={veiculoEmUsoDoTecnico.gasolina}
+                    max={100}
+                    className={`mt-2 h-3 w-full appearance-none overflow-hidden rounded-full bg-slate-200 ${
+                      veiculoEmUsoDoTecnico.gasolina <= 20
+                        ? "accent-red-500"
+                        : veiculoEmUsoDoTecnico.gasolina <= 50
+                        ? "accent-amber-500"
+                        : "accent-emerald-500"
+                    }`}
+                  />
                 </div>
               </div>
               <div className="sm:col-span-2 rounded-3xl border border-slate-200 bg-white p-5">
@@ -571,23 +570,26 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm font-semibold text-slate-700">
-                  <span>Nível de gasolina</span>
+                  <label htmlFor="gasolina-range" className="block">
+                    Nível de gasolina
+                  </label>
                   <span>{form.gasolina}%</span>
                 </div>
                 <input
+                  id="gasolina-range"
                   type="range"
                   min="0"
                   max="100"
                   value={form.gasolina}
                   onChange={(e) => handleFieldChange("gasolina", Number(e.target.value))}
                   className="w-full accent-emerald-500"
+                  aria-label="Nível de gasolina"
                 />
-                <div className="h-3 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className="h-full rounded-full bg-linear-to-r from-emerald-500 via-cyan-500 to-sky-500 transition-all"
-                    style={{ width: `${form.gasolina}%` }}
-                  />
-                </div>
+                <progress
+                  value={form.gasolina}
+                  max={100}
+                  className="mt-2 h-3 w-full appearance-none overflow-hidden rounded-full bg-slate-100 accent-emerald-500"
+                />
               </div>
 
               <label className="space-y-2">
@@ -626,7 +628,7 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <button
                   type="submit"
-                  className="inline-flex items-center justify-center gap-2 rounded-3xl bg-linear-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-sky-500/30"
+                  className="inline-flex items-center justify-center gap-2 rounded-3xl bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-sky-500/30"
                 >
                   <Plus className="w-4 h-4" />
                   {editId ? "Atualizar veículo" : "Adicionar veículo"}
@@ -782,15 +784,16 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
                         <span>{veiculo.gasolina}%</span>
                       </div>
                       <div className="mt-2 h-3 overflow-hidden rounded-full bg-slate-200">
-                        <div
-                          className={`h-full rounded-full ${
+                        <progress
+                          value={veiculo.gasolina}
+                          max={100}
+                          className={`h-3 w-full appearance-none overflow-hidden rounded-full ${
                             veiculo.gasolina <= 20
-                              ? "bg-red-500"
+                              ? "accent-red-500"
                               : veiculo.gasolina <= 50
-                              ? "bg-amber-500"
-                              : "bg-emerald-500"
+                              ? "accent-amber-500"
+                              : "accent-emerald-500"
                           }`}
-                          style={{ width: `${veiculo.gasolina}%` }}
                         />
                       </div>
                     </div>

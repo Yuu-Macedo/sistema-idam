@@ -1,7 +1,8 @@
-type AnyRecord = Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRecord = Record<string, any>;
 
 interface Props {
-  produtor: string;
+  produtor: AnyRecord;
   atendimento: AnyRecord;
   atividadesAdicionais?: {
     agricultura: string[];
@@ -56,8 +57,12 @@ function produtorTemCategoria(produtor: AnyRecord, categoria: string) {
 }
 
 function produtorTemSubtipo(produtor: AnyRecord, subtipo: string) {
-  return (produtor.atividades || []).some((a: AnyRecord) =>
-    a.tipos?.includes(subtipo),
+  const atividades = Array.isArray(produtor.atividades)
+    ? produtor.atividades as AnyRecord[]
+    : [];
+
+  return atividades.some((a: AnyRecord) =>
+    Array.isArray(a.tipos) ? a.tipos.includes(subtipo) : false,
   );
 }
 
@@ -652,17 +657,7 @@ export default function AtendimentoDocumento({
           }
         }
       `}</style>
-      <div
-        className="bg-white text-black mx-auto impressao-documento"
-        style={{
-          width: "1123px",
-          minHeight: "794px",
-          padding: "28px 32px",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "10pt",
-          lineHeight: 1.35,
-        }}
-      >
+      <div className="bg-white text-black mx-auto impressao-documento w-[1123px] min-h-[794px] py-[28px] px-[32px] font-sans text-[10pt] leading-[1.35]">
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold">
             RELATÓRIO DE ATENDIMENTO TÉCNICO

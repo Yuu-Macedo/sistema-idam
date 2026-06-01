@@ -641,12 +641,13 @@ export default function RelatorioGeralProdutor() {
       </div>
 
       <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-        <label className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-foreground">
+        <label htmlFor="select-produtor" className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-foreground">
           <User className="h-4 w-4 text-emerald-600" />
           Selecionar Produtor
         </label>
 
         <select
+          id="select-produtor"
           className="mt-3 w-full rounded-lg border-2 border-border bg-background px-4 py-3 transition-all hover:border-emerald-500 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20"
           value={produtorSelecionado?.id ?? ""}
           onChange={(e) => {

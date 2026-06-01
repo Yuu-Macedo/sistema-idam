@@ -83,6 +83,20 @@ const CORES = [
   "#f39c12",
 ];
 
+const COR_CLASSES: Record<string, string> = {
+  "#2d6a3e": "bg-emerald-900",
+  "#4a90e2": "bg-blue-600",
+  "#e27a4a": "bg-orange-500",
+  "#9b59b6": "bg-violet-600",
+  "#e74c3c": "bg-red-600",
+  "#16a085": "bg-teal-700",
+  "#f39c12": "bg-amber-500",
+};
+
+function getAtividadeBgClass(cor: string) {
+  return COR_CLASSES[cor] ?? "bg-slate-700";
+}
+
 const FORM_INICIAL = {
   produtorId: "",
   produtorNome: "",
@@ -521,10 +535,11 @@ export default function CronogramaSemanalMelhorado() {
             {/* DIA E TIPO DE ATIVIDADE */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">
+                <label htmlFor="dia-semana" className="block text-sm font-semibold text-foreground mb-2">
                   Dia da Semana <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="dia-semana"
                   required
                   value={formData.diaSemana}
                   onChange={(e) =>
@@ -544,10 +559,11 @@ export default function CronogramaSemanalMelhorado() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">
+                <label htmlFor="tipo-atividade" className="block text-sm font-semibold text-foreground mb-2">
                   Tipo de Atividade <span className="text-red-500">*</span>
                 </label>
                 <select
+                  id="tipo-atividade"
                   required
                   value={formData.tipoAtividade}
                   onChange={(e) =>
@@ -608,10 +624,11 @@ export default function CronogramaSemanalMelhorado() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-blue-800 mb-1">
+                    <label htmlFor="saida-manha" className="block text-xs text-blue-800 mb-1">
                       Saída
                     </label>
                     <input
+                      id="saida-manha"
                       type="time"
                       value={formData.horarioSaidaManha}
                       onChange={(e) =>
@@ -624,10 +641,11 @@ export default function CronogramaSemanalMelhorado() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-blue-800 mb-1">
+                    <label htmlFor="entrada-manha" className="block text-xs text-blue-800 mb-1">
                       Entrada
                     </label>
                     <input
+                      id="entrada-manha"
                       type="time"
                       value={formData.horarioEntradaManha}
                       onChange={(e) =>
@@ -655,10 +673,11 @@ export default function CronogramaSemanalMelhorado() {
                 </p>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs text-orange-800 mb-1">
+                    <label htmlFor="saida-tarde" className="block text-xs text-orange-800 mb-1">
                       Saída
                     </label>
                     <input
+                      id="saida-tarde"
                       type="time"
                       value={formData.horarioSaidaTarde}
                       onChange={(e) =>
@@ -671,10 +690,11 @@ export default function CronogramaSemanalMelhorado() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-orange-800 mb-1">
+                    <label htmlFor="entrada-tarde" className="block text-xs text-orange-800 mb-1">
                       Entrada
                     </label>
                     <input
+                      id="entrada-tarde"
                       type="time"
                       value={formData.horarioEntradaTarde}
                       onChange={(e) =>
@@ -696,10 +716,11 @@ export default function CronogramaSemanalMelhorado() {
 
             {/* DESCRIÇÃO */}
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label htmlFor="descricao-atividade" className="block text-sm font-semibold text-foreground mb-2">
                 Descrição da Atividade <span className="text-red-500">*</span>
               </label>
               <input
+                id="descricao-atividade"
                 type="text"
                 required
                 value={formData.descricaoAtividade}
@@ -755,6 +776,7 @@ export default function CronogramaSemanalMelhorado() {
                   Justificativa <span className="text-red-500">*</span>
                 </label>
                 <textarea
+                  id="justificativa-atividade"
                   required
                   value={formData.justificativa}
                   onChange={(e) =>
@@ -773,6 +795,7 @@ export default function CronogramaSemanalMelhorado() {
                 Observações
               </label>
               <textarea
+                id="observacoes-atividade"
                 value={formData.observacoes}
                 onChange={(e) =>
                   setFormData({ ...formData, observacoes: e.target.value })
@@ -858,16 +881,14 @@ export default function CronogramaSemanalMelhorado() {
                   {DIAS_SEMANA.map((dia) => (
                     <td
                       key={dia.key}
-                      className="border border-gray-300 p-2 align-top"
-                      style={{ minWidth: "150px" }}
+                      className="border border-gray-300 p-2 align-top min-w-[150px]"
                     >
                       <div className="space-y-2">
                         {getAtividadesDoDia(dia.key, "manha").map(
                           (atividade) => (
                             <div
                               key={atividade.id}
-                              className="p-2 rounded text-white text-xs group relative"
-                              style={{ backgroundColor: atividade.cor }}
+                              className={`p-2 rounded text-white text-xs group relative ${getAtividadeBgClass(atividade.cor)}`}
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <span className="font-semibold text-xs bg-white/20 px-2 py-0.5 rounded">
@@ -887,12 +908,16 @@ export default function CronogramaSemanalMelhorado() {
                               </div>
                               <div className="absolute top-1 right-1 hidden group-hover:flex gap-1">
                                 <button
+                                  type="button"
+                                  aria-label="Editar atividade de manhã"
                                   onClick={() => handleEditar(atividade)}
                                   className="bg-white/20 hover:bg-white/40 p-1 rounded"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                 </button>
                                 <button
+                                  type="button"
+                                  aria-label="Excluir atividade de manhã"
                                   onClick={() => handleExcluir(atividade.id)}
                                   className="bg-white/20 hover:bg-white/40 p-1 rounded"
                                 >
@@ -915,16 +940,14 @@ export default function CronogramaSemanalMelhorado() {
                   {DIAS_SEMANA.map((dia) => (
                     <td
                       key={dia.key}
-                      className="border border-gray-300 p-2 align-top"
-                      style={{ minWidth: "150px" }}
+                      className="border border-gray-300 p-2 align-top min-w-[150px]"
                     >
                       <div className="space-y-2">
                         {getAtividadesDoDia(dia.key, "tarde").map(
                           (atividade) => (
                             <div
                               key={atividade.id}
-                              className="p-2 rounded text-white text-xs group relative"
-                              style={{ backgroundColor: atividade.cor }}
+                              className={`p-2 rounded text-white text-xs group relative ${getAtividadeBgClass(atividade.cor)}`}
                             >
                               <div className="flex items-center justify-between mb-1">
                                 <span className="font-semibold text-xs bg-white/20 px-2 py-0.5 rounded">
@@ -944,12 +967,16 @@ export default function CronogramaSemanalMelhorado() {
                               </div>
                               <div className="absolute top-1 right-1 hidden group-hover:flex gap-1">
                                 <button
+                                  type="button"
+                                  aria-label="Editar atividade da tarde"
                                   onClick={() => handleEditar(atividade)}
                                   className="bg-white/20 hover:bg-white/40 p-1 rounded"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                 </button>
                                 <button
+                                  type="button"
+                                  aria-label="Excluir atividade da tarde"
                                   onClick={() => handleExcluir(atividade.id)}
                                   className="bg-white/20 hover:bg-white/40 p-1 rounded"
                                 >

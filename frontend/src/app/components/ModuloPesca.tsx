@@ -42,7 +42,7 @@ export default function ModuloPesca({
       trimestre,
       ano
     });
-  }, [trimestre, ano]);
+  }, [dados, onChange, trimestre, ano]);
 
   const adicionarEspecie = () => {
     onChange({
@@ -71,10 +71,7 @@ export default function ModuloPesca({
     <div className="space-y-6">
       {/* HEADER DO MÓDULO */}
       <div
-        className="rounded-xl p-6 shadow-lg text-white"
-        style={{
-          background: 'linear-gradient(135deg, #0ea5e9 0%, #06b6d4 50%, #14b8a6 100%)'
-        }}
+        className="rounded-xl p-6 shadow-lg text-white bg-[linear-gradient(135deg,_#0ea5e9_0%,_#06b6d4_50%,_#14b8a6_100%)]"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -148,10 +145,11 @@ export default function ModuloPesca({
             <div className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-foreground font-medium mb-2">
+                  <label htmlFor="tipo-pesca" className="block text-foreground font-medium mb-2">
                     Tipo de Pesca
                   </label>
                   <select
+                    id="tipo-pesca"
                     value={dados.tipoPesca}
                     onChange={(e) => onChange({ ...dados, tipoPesca: e.target.value })}
                     disabled={disabled}
@@ -208,10 +206,11 @@ export default function ModuloPesca({
                 </div>
 
                 <div>
-                  <label className="block text-foreground font-medium mb-2">
+                  <label htmlFor="margem-pesca" className="block text-foreground font-medium mb-2">
                     Margem
                   </label>
                   <select
+                    id="margem-pesca"
                     value={dados.margemPesca}
                     onChange={(e) => onChange({ ...dados, margemPesca: e.target.value })}
                     disabled={disabled}
@@ -297,6 +296,7 @@ export default function ModuloPesca({
                           onClick={() => removerEspecie(index)}
                           className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
                           title="Remover espécie"
+                          aria-label="Remover espécie"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -377,10 +377,11 @@ export default function ModuloPesca({
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-foreground mb-2">
+                        <label htmlFor="margem-subsistencia" className="block text-sm font-medium text-foreground mb-2">
                           Margem de Atuação
                         </label>
                         <select
+                          id="margem-subsistencia"
                           value={dados.margemPesca}
                           onChange={(e) => onChange({ ...dados, margemPesca: e.target.value })}
                           disabled={disabled}
@@ -466,6 +467,8 @@ export default function ModuloPesca({
                               type="button"
                               onClick={() => removerEspecie(index)}
                               className="px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all"
+                              title="Remover espécie"
+                              aria-label="Remover espécie"
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

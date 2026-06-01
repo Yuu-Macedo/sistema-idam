@@ -266,10 +266,7 @@ export default function HistoricoTrimestreComponent() {
       <div className="space-y-6">
         {/* HEADER */}
         <div
-          className="rounded-xl p-6 shadow-lg text-white"
-          style={{
-            background: "linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a855f7 100%)",
-          }}
+          className="rounded-xl p-6 shadow-lg text-white bg-[linear-gradient(135deg,_#6366f1_0%,_#8b5cf6_50%,_#a855f7_100%)]"
         >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -318,10 +315,11 @@ export default function HistoricoTrimestreComponent() {
           </div>
 
           <div className="mt-4">
-            <label className="text-sm font-medium text-foreground block mb-2">
+            <label htmlFor="produtor-seletor" className="text-sm font-medium text-foreground block mb-2">
               Ou selecione da lista
             </label>
             <select
+              id="produtor-seletor"
               value={produtorSelecionado?.id || ""}
               onChange={(e) => {
                 const produtor = produtores.find(p => p.id === e.target.value);

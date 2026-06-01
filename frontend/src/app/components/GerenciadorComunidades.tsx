@@ -166,6 +166,8 @@ export default function GerenciadorComunidades() {
                 type="button"
                 onClick={limparFormulario}
                 className="px-6 py-3 border-2 border-border rounded-lg hover:bg-accent transition-all font-semibold"
+                aria-label="Cancelar"
+                title="Cancelar"
               >
                 <X className="w-5 h-5" />
               </button>
