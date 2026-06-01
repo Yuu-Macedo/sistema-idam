@@ -87,14 +87,14 @@ export default function Login({ onLogin }: LoginProps) {
             <div className="absolute -left-8 top-16 h-72 w-px bg-linear-to-b from-transparent via-primary/25 to-transparent" />
             <div className="mb-8 inline-flex items-center gap-3 rounded-full border border-primary/15 bg-white/70 px-4 py-2 text-sm font-semibold text-primary shadow-sm backdrop-blur">
               <Leaf className="h-4 w-4" />
-              Gestão de atendimento rural
+              Instituto de Desenvolvimento Agropecuário e Florestal
             </div>
             <h1 className="text-5xl font-semibold leading-tight text-slate-950">
-              Um caderno de campo digital para a equipe técnica.
+              Atendimento rural integrado para a equipe do IDAM.
             </h1>
             <p className="mt-5 text-lg leading-8 text-slate-600">
               Cadastro, histórico e emissão aparecem como etapas da mesma visita,
-              com contexto suficiente para o atendimento não virar retrabalho.
+              com contexto suficiente para apoiar o acompanhamento agropecuário e florestal.
             </p>
             <div className="mt-8 space-y-3">
               {[
@@ -147,7 +147,7 @@ export default function Login({ onLogin }: LoginProps) {
               <Leaf className="h-8 w-8 text-white" />
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-primary">
-              IDAM Rural
+              IDAM
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-950">
               Acesse sua área de trabalho
