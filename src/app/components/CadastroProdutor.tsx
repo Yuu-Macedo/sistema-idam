@@ -120,6 +120,7 @@ interface CadastroProdutorFormData {
 
   // Apicultura
   abelhas: {
+    nomecientifico: string;
     tipo: string;
     numeroColmeias: string;
     producaoMel: string;
@@ -313,6 +314,7 @@ interface Produtor extends CadastroProdutorFormData {
 
   // Apicultura
   abelhas: {
+    nomecientifico: string;
     tipo: string;
     numeroColmeias: string;
     producaoMel: string;
@@ -536,6 +538,7 @@ export default function CadastroProdutor() {
       // Apicultura / Meliponicultura
       abelhas: [
         {
+          nomecientifico: "",
           tipo: "",
           numeroColmeias: "",
           producaoMel: "",
@@ -1117,6 +1120,7 @@ export default function CadastroProdutor() {
       pecuaria: [],
       abelhas: [
         {
+          nomecientifico: "",
           tipo: "",
           numeroColmeias: "",
           producaoMel: "",
@@ -3227,6 +3231,7 @@ export default function CadastroProdutor() {
                                   ? novaLista
                                   : [
                                       {
+                                        nomecientifico: "",
                                         tipo: "",
                                         numeroColmeias: "",
                                         producaoMel: "",
@@ -3243,6 +3248,28 @@ export default function CadastroProdutor() {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                          <label className="text-sm font-medium text-foreground" id="nomeCientifico">
+                            Nome Científico
+                          </label>
+                          <input
+                            aria-labelledby="nomeCientifico"
+                            type="text"
+                            value={abelha.nomecientifico}
+                            onChange={(e) => {
+                              const novaLista = [
+                                ...formData.abelhas,
+                              ];
+                              novaLista[index].nomecientifico = e.target.value;
+
+                              setFormData({
+                                ...formData,
+                                abelhas: novaLista,
+                              });
+                            }}
+                            className="w-full px-4 py-2.5 rounded-lg border border-border"
+                          />
+                        </div>
                         <div className="space-y-2">
                           <label className="text-sm font-medium text-foreground" id="tipoAbelha">
                             Tipo de Abelha
@@ -3418,6 +3445,7 @@ export default function CadastroProdutor() {
                         abelhas: [
                           ...formData.abelhas,
                           {
+                            nomecientifico: "",
                             tipo: "",
                             numeroColmeias: "",
                             producaoMel: "",
