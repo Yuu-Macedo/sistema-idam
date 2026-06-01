@@ -63,6 +63,7 @@ interface CadastroProdutorFormData {
   perfil: string[];
   situacaoImovel: string;
   caracteristicas: string[];
+  tipoArea: string; // Nova propriedade para tipo de área
 
   // ================== ATIVIDADES ==================
   atividades: {
@@ -255,6 +256,7 @@ interface Produtor extends CadastroProdutorFormData {
   perfil: string[];
   situacaoImovel: string;
   caracteristicas: string[];
+  tipoArea: string; // Nova propriedade para tipo de área
 
   // ================== ATIVIDADES ==================
   atividades: {
@@ -478,7 +480,7 @@ export default function CadastroProdutor() {
       producaoFlorestal: [
         { produto: "", quantidade: "", unidade: "" },
       ],
-
+      tipoArea: "",
       possuiSistemaAgroflorestal: false,
       numeroPlantasAcai: "",
       numeroPlantasBanana: "",
@@ -577,7 +579,6 @@ export default function CadastroProdutor() {
       "Grãos",
       "Horticultura",
       "Fruticultura",
-      "Mandioca",
       "Culturas Industriais",
     ],
     Pecuaria: [
@@ -845,6 +846,7 @@ export default function CadastroProdutor() {
       tipoLocalizacao: "",
       especificacaoLocalizacao: "",
       tipoCoordenada: "decimal",
+      tipoArea: "",
       km: "",
       margem: "",
       latitude: "",
@@ -1060,6 +1062,7 @@ export default function CadastroProdutor() {
       outrasProducoes: "",
       outrasInformacoesAtividades: "",
       observacoesBeneficiario: "",
+      tipoArea: "",
       producaoFlorestal: [
         { produto: "", quantidade: "", unidade: "" },
       ],
@@ -2430,11 +2433,40 @@ export default function CadastroProdutor() {
                   Condições de acesso e tipo de área
                 </p>
               </div>
+              <label>
+                <input
+                  type="radio"
+                  name="tipoArea"
+                  value="Zona Rural"
+                  checked={formData.tipoArea === "Zona Rural"}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tipoArea: e.target.value,
+                    }))
+                  }
+                />
+                Zona Rural
+              </label>
 
+              <label>
+                <input
+                  type="radio"
+                  name="tipoArea"
+                  value="Zona Urbana"
+                  checked={formData.tipoArea === "Zona Urbana"}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tipoArea: e.target.value,
+                    }))
+                  }
+                />
+                Zona Urbana
+              </label>
+              
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
-                  "Zona Rural",
-                  "Zona Urbana",
                   "Via Fluvial",
                   "Asfalto",
                   "Terra Boa",
