@@ -141,10 +141,7 @@ function HistoricoTecnico({
   return (
     <div className="space-y-6">
       <div
-        className="rounded-xl p-6 shadow-lg text-white"
-        style={{
-          background: 'linear-gradient(135deg, #ffa000 0%, #ffb300 50%, #ffc107 100%)'
-        }}
+        className="rounded-xl p-6 shadow-lg text-white bg-[linear-gradient(135deg,_#ffa000_0%,_#ffb300_50%,_#ffc107_100%)]"
       >
         <div className="flex items-center gap-3">
           <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-lg">
@@ -326,10 +323,7 @@ function RelatorioGeralProdutor() {
   return (
     <div className="space-y-6">
       <div
-        className="rounded-xl p-6 shadow-lg text-white"
-        style={{
-          background: 'linear-gradient(135deg, #1976d2 0%, #2196f3 50%, #42a5f5 100%)'
-        }}
+        className="rounded-xl p-6 shadow-lg text-white bg-[linear-gradient(135deg,_#1976d2_0%,_#2196f3_50%,_#42a5f5_100%)]"
       >
         <div className="flex items-center gap-3">
           <div className="bg-white/20 backdrop-blur-sm p-2.5 rounded-lg">
@@ -348,11 +342,12 @@ function RelatorioGeralProdutor() {
       </div>
 
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
-        <label className="text-sm font-medium text-foreground">
+        <label htmlFor="historico-produtor" className="text-sm font-medium text-foreground">
           Selecione o produtor
         </label>
 
         <select
+          id="historico-produtor"
           className="w-full mt-2 px-4 py-2 rounded-lg border border-border bg-background text-foreground"
           value={produtorSelecionado?.id || ""}
           onChange={(e) => {
@@ -808,11 +803,8 @@ export default function App() {
     <div className="min-h-screen bg-background">
       <div className="relative lg:ml-72">
         <header
-          className="text-white shadow-lg"
-        style={{
-          background: 'linear-gradient(135deg, #2d6a3e 0%, #43a047 50%, #66bb6a 100%)'
-        }}
-      >
+          className="text-white shadow-lg bg-[linear-gradient(135deg,_#2d6a3e_0%,_#43a047_50%,_#66bb6a_100%)]"
+        >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -820,6 +812,8 @@ export default function App() {
                 type="button"
                 onClick={() => setSidebarAberto(true)}
                 className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-white/10 p-2 text-white hover:bg-white/20 lg:hidden"
+                title="Abrir menu"
+                aria-label="Abrir menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -929,6 +923,8 @@ export default function App() {
               type="button"
               className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition hover:bg-slate-100 lg:hidden"
               onClick={() => setSidebarAberto(false)}
+              title="Fechar menu"
+              aria-label="Fechar menu"
             >
               <X className="w-5 h-5" />
             </button>

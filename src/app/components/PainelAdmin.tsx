@@ -411,10 +411,15 @@ export default function PainelAdmin() {
                   </div>
                 </div>
 
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden mb-3">
-                  <div
-                    className="h-full bg-primary"
-                    style={{ width: `${tecnico.progresso}%` }}
+                <div className="mb-3">
+                  <label htmlFor={`progresso-${tecnico.id}`} className="sr-only">
+                    Progresso do técnico {tecnico.nome}
+                  </label>
+                  <progress
+                    id={`progresso-${tecnico.id}`}
+                    value={tecnico.progresso}
+                    max={100}
+                    className="w-full h-3 rounded-full bg-muted overflow-hidden text-primary"
                   />
                 </div>
 

@@ -104,27 +104,32 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip;
 
+type ChartTooltipPayload = {
+  dataKey?: string | number;
+  name?: string;
+  value?: number | string;
+  color?: string;
+  payload?: Record<string, unknown>;
+};
+
 type ChartTooltipContentProps = React.ComponentProps<"div"> & {
   active?: boolean;
-  payload?: Array<{
-    dataKey?: string | number;
-    name?: string;
-    value?: number | string;
-    color?: string;
-    payload?: Record<string, any>;
-  }>;
+  payload?: ChartTooltipPayload[];
   label?: string | number;
   indicator?: "line" | "dot" | "dashed";
   hideLabel?: boolean;
   hideIndicator?: boolean;
-  labelFormatter?: (label: any, payload: any) => React.ReactNode;
+  labelFormatter?: (
+    label: React.ReactNode,
+    payload: ChartTooltipPayload[] | undefined,
+  ) => React.ReactNode;
   labelClassName?: string;
   formatter?: (
-    value: any,
-    name: any,
-    item: any,
+    value: number | string | undefined,
+    name: string | number | undefined,
+    item: ChartTooltipPayload | undefined,
     index: number,
-    payload: any,
+    payload: Record<string, unknown> | undefined,
   ) => React.ReactNode;
   color?: string;
   nameKey?: string;
@@ -202,7 +207,12 @@ function ChartTooltipContent({
         {payload.map((item, index) => {
           const key = `${nameKey || item.name || item.dataKey || "value"}`;
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
-          const indicatorColor = color || item.payload?.fill || item.color;
+          const indicatorColor =
+            color ||
+            (item.payload && typeof item.payload.fill === "string"
+              ? item.payload.fill
+              : undefined) ||
+            item.color;
 
           return (
             <div
@@ -216,28 +226,48 @@ function ChartTooltipContent({
                 formatter(item.value, item.name, item, index, item.payload)
               ) : (
                 <>
-                  {itemConfig?.icon ? (
+                          {itemConfig?.icon ? (
                     <itemConfig.icon />
                   ) : (
                     !hideIndicator && (
-                      <div
+                      <svg
                         className={cn(
-                          "shrink-0 rounded-[2px] border-(--color-border) bg-(--color-bg)",
-                          {
-                            "h-2.5 w-2.5": indicator === "dot",
-                            "w-1": indicator === "line",
-                            "w-0 border-[1.5px] border-dashed bg-transparent":
-                              indicator === "dashed",
-                            "my-0.5": nestLabel && indicator === "dashed",
-                          },
+                          "shrink-0",
+                          indicator === "dot" && "h-2.5 w-2.5",
+                          indicator === "line" && "h-2.5 w-1",
+                          indicator === "dashed" && "h-2.5 w-4",
+                          nestLabel && indicator === "dashed" && "my-0.5",
                         )}
-                        style={
-                          {
-                            "--color-bg": indicatorColor,
-                            "--color-border": indicatorColor,
-                          } as React.CSSProperties
-                        }
-                      />
+                        viewBox="0 0 10 10"
+                        aria-hidden="true"
+                      >
+                        {indicator === "dot" ? (
+                          <circle
+                            cx="5"
+                            cy="5"
+                            r="4"
+                            fill={indicatorColor || "currentColor"}
+                          />
+                        ) : indicator === "line" ? (
+                          <rect
+                            x="4"
+                            y="0"
+                            width="2"
+                            height="10"
+                            fill={indicatorColor || "currentColor"}
+                          />
+                        ) : (
+                          <line
+                            x1="0"
+                            y1="5"
+                            x2="10"
+                            y2="5"
+                            stroke={indicatorColor || "currentColor"}
+                            strokeWidth="1.5"
+                            strokeDasharray="2 2"
+                          />
+                        )}
+                      </svg>
                     )
                   )}
                   <div
@@ -271,14 +301,7 @@ function ChartTooltipContent({
 const ChartLegend = RechartsPrimitive.Legend;
 
 type ChartLegendContentProps = React.ComponentProps<"div"> & {
-  payload?: Array<{
-    dataKey?: string | number;
-    name?: string;
-    value?: number | string;
-    color?: string;
-    payload?: Record<string, any>;
-    icon?: React.ComponentType;
-  }>;
+  payload?: Array<ChartTooltipPayload & { icon?: React.ComponentType }>;
   verticalAlign?: "top" | "bottom" | "middle";
   hideIcon?: boolean;
   nameKey?: string;
@@ -319,12 +342,18 @@ function ChartLegendContent({
             {itemConfig?.icon && !hideIcon ? (
               <itemConfig.icon />
             ) : (
-              <div
-                className="h-2 w-2 shrink-0 rounded-[2px]"
-                style={{
-                  backgroundColor: item.color,
-                }}
-              />
+              <svg
+                className="h-2 w-2 shrink-0"
+                viewBox="0 0 8 8"
+                aria-hidden="true"
+              >
+                <rect
+                  width="8"
+                  height="8"
+                  rx="2"
+                  fill={item.color || "currentColor"}
+                />
+              </svg>
             )}
             {itemConfig?.label}
           </div>

@@ -1,12 +1,3 @@
-type CulturaAgricola = {
-  id: string;
-  nome: string;
-  tipo: string;
-  areaPlantada: string;
-  produtividadeMedia: string;
-  producaoTotal: string;
-};
-
 import { useState } from "react";
 import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "./ui/badge";
@@ -407,23 +398,9 @@ export default function CadastroProdutor() {
   const [modoEdicao, setModoEdicao] = useState(false);
   const [produtorEmEdicaoId, setProdutorEmEdicaoId] =
   useState<string | null>(null);
-  const [culturas, setCulturas] = useState<CulturaAgricola[]>([]);
   const [buscaProdutor, setBuscaProdutor] = useState("");
   const [mostrarListaProdutores, setMostrarListaProdutores] = useState(false);
 
-  const adicionarCultura = () => {
-  setCulturas([
-    ...culturas,
-    {
-      id: crypto.randomUUID(),
-      nome: "",
-      tipo: "",
-      areaPlantada: "",
-      produtividadeMedia: "",
-      producaoTotal: "",
-    },
-  ]);
-};
   const totalSteps = 7;
   const [formData, setFormData] =
     useState<CadastroProdutorFormData>({
@@ -2186,7 +2163,7 @@ export default function CadastroProdutor() {
                           title="Mapa da localização"
                           width="100%"
                           height="300"
-                          style={{ border: 0 }}
+                          className="border-0"
                           loading="lazy"
                           allowFullScreen
                           src={`https://maps.google.com/maps?q=${formData.latitude},${formData.longitude}&z=15&output=embed`}

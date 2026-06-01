@@ -163,15 +163,7 @@ export default function DeclaracaoPescadorOficial({
         }
       `}</style>
       <div
-        className="bg-white text-black mx-auto shadow-sm impressao-pescador"
-        style={{
-          width: "794px",
-          minHeight: "1123px",
-          padding: "56px 64px",
-          fontFamily: "Arial, sans-serif",
-          fontSize: "12pt",
-          lineHeight: 1.7,
-        }}
+        className="bg-white text-black mx-auto shadow-sm impressao-pescador w-[794px] min-h-[1123px] px-[64px] py-[56px] font-[Arial,_sans-serif] text-[12pt] leading-[1.7]"
       >
       <div className="text-center mb-10">
         <h1 className="text-xl font-bold tracking-wide">

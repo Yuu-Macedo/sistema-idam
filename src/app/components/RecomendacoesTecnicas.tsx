@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import RecomendacoesDocumento from "./RecomendacoesDocumento";
 import { Printer } from "lucide-react";
@@ -30,7 +30,7 @@ interface Recomendacao {
 }
 
 export default function RecomendacoesTecnicas() {
-  const [produtores, setProdutores] = useState<Produtor[]>(() => {
+  const [produtores] = useState<Produtor[]>(() => {
     const stored = localStorage.getItem("produtores");
     return stored ? JSON.parse(stored) : [];
   });
@@ -63,17 +63,6 @@ export default function RecomendacoesTecnicas() {
     data: new Date().toISOString().split("T")[0],
     documento: "",
   });
-
-  useEffect(() => {
-    setProdutores(
-      JSON.parse(localStorage.getItem("produtores") || "[]"),
-    );
-    setRecomendacoes(
-      JSON.parse(
-        localStorage.getItem("recomendacoesTecnicas") || "[]",
-      ),
-    );
-  }, []);
 
   const produtoresFiltrados = produtores.filter(
     (p) =>
@@ -188,14 +177,22 @@ export default function RecomendacoesTecnicas() {
             Produtor: {produtorSelecionado.nome}
           </h2>
 
+          <label htmlFor="tecnico-responsavel" className="block text-sm font-medium mb-2">
+            Técnico responsável
+          </label>
           <input
+            id="tecnico-responsavel"
             type="text"
             value={formData.tecnicoResponsavel}
             disabled
             className="w-full px-4 py-2 border rounded-lg bg-gray-100"
           />
 
+          <label htmlFor="recomendacao-textarea" className="block text-sm font-medium mb-2">
+            Recomendação técnica
+          </label>
           <textarea
+            id="recomendacao-textarea"
             placeholder="Digite a recomendação técnica..."
             value={formData.recomendacao}
             onChange={(e) =>

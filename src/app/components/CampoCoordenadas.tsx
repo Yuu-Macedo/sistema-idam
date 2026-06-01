@@ -153,19 +153,20 @@ export default function CampoCoordenadas({ dados, onChange }: CampoCoordenadasPr
     <div className="space-y-5">
       {/* TIPO DE COORDENADA */}
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-foreground">
+        <label htmlFor="conversao-automatica" className="block text-sm font-semibold text-foreground">
           Formato das Coordenadas
         </label>
         <div className="flex items-center gap-2">
           <input
+            id="conversao-automatica"
             type="checkbox"
             checked={conversaoAutomatica}
             onChange={(e) => setConversaoAutomatica(e.target.checked)}
             className="w-4 h-4 rounded border-border"
           />
-          <span className="text-xs text-muted-foreground">
+          <label htmlFor="conversao-automatica" className="text-xs text-muted-foreground cursor-pointer">
             Conversão automática
-          </span>
+          </label>
         </div>
       </div>
 
@@ -208,10 +209,11 @@ export default function CampoCoordenadas({ dados, onChange }: CampoCoordenadasPr
         <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label htmlFor="latitude-decimal" className="block text-sm font-semibold text-foreground mb-2">
                 Latitude (Decimal)
               </label>
               <input
+                id="latitude-decimal"
                 type="text"
                 value={dados.latitude}
                 onChange={(e) => onChange({ ...dados, latitude: e.target.value })}
@@ -224,10 +226,11 @@ export default function CampoCoordenadas({ dados, onChange }: CampoCoordenadasPr
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
+              <label htmlFor="longitude-decimal" className="block text-sm font-semibold text-foreground mb-2">
                 Longitude (Decimal)
               </label>
               <input
+                id="longitude-decimal"
                 type="text"
                 value={dados.longitude}
                 onChange={(e) => onChange({ ...dados, longitude: e.target.value })}
@@ -301,8 +304,9 @@ export default function CampoCoordenadas({ dados, onChange }: CampoCoordenadasPr
                 />
               </div>
               <div>
-                <label className="block text-xs text-red-800 mb-1">Direção</label>
+                <label htmlFor="latitude-direcao" className="block text-xs text-red-800 mb-1">Direção</label>
                 <select
+                  id="latitude-direcao"
                   value={dados.latitudeDirecao || "S"}
                   onChange={(e) => onChange({ ...dados, latitudeDirecao: e.target.value })}
                   className="w-full px-3 py-2 rounded border border-red-300 bg-white"
@@ -352,8 +356,9 @@ export default function CampoCoordenadas({ dados, onChange }: CampoCoordenadasPr
                 />
               </div>
               <div>
-                <label className="block text-xs text-blue-800 mb-1">Direção</label>
+                <label htmlFor="longitude-direcao" className="block text-xs text-blue-800 mb-1">Direção</label>
                 <select
+                  id="longitude-direcao"
                   value={dados.longitudeDirecao || "W"}
                   onChange={(e) => onChange({ ...dados, longitudeDirecao: e.target.value })}
                   className="w-full px-3 py-2 rounded border border-blue-300 bg-white"

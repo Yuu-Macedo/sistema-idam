@@ -9,16 +9,20 @@ import {
   X,
 } from "lucide-react";
 
+interface Usuario {
+  id: string;
+  nome: string;
+  email: string;
+  senha?: string;
+  tipo: "adm" | "tecnico";
+  numeroConselho?: string;
+  dataCadastro?: string;
+}
+
 interface CadastroUsuarioProps {
   onClose: () => void;
   onSalvar?: () => void;
-  usuarioEdicao?: {
-    id: string;
-    nome: string;
-    email: string;
-    tipo: "adm" | "tecnico";
-    numeroConselho?: string;
-  } | null;
+  usuarioEdicao?: Usuario | null;
   permitirEscolherTipo?: boolean;
 }
 
@@ -49,7 +53,7 @@ export default function CadastroUsuario({
       ? "text-blue-900 bg-blue-100 border-blue-200"
       : "text-emerald-900 bg-emerald-100 border-emerald-200";
 
-  // eslint-disable-next-line react-hooks/set-state-in-effect
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (usuarioEdicao) {
       setNome(usuarioEdicao.nome || "");
@@ -58,6 +62,7 @@ export default function CadastroUsuario({
       setNumeroConselho(usuarioEdicao.numeroConselho || "");
     }
   }, [usuarioEdicao]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,10 +95,10 @@ export default function CadastroUsuario({
 
     const usuarios = JSON.parse(
       localStorage.getItem("usuarios") || "[]",
-    );
+    ) as Usuario[];
 
     const emailExiste = usuarios.find(
-      (u: any) =>
+      (u: Usuario) =>
         u.email === email &&
         (!usuarioEdicao || u.id !== usuarioEdicao.id),
     );
@@ -104,7 +109,7 @@ export default function CadastroUsuario({
     }
 
     if (usuarioEdicao) {
-      const atualizados = usuarios.map((u: any) =>
+      const atualizados = usuarios.map((u: Usuario) =>
         u.id === usuarioEdicao.id
           ? {
               ...u,
@@ -158,16 +163,15 @@ export default function CadastroUsuario({
       <div className="min-h-[calc(100vh-4rem)] flex items-start justify-center px-4 py-10">
         <div className="w-full max-w-md bg-white/95 backdrop-blur-xl rounded-[2rem] border-2 border-cyan-400/30 p-6 pb-8 shadow-[0_25px_80px_rgba(59,130,246,0.18)] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[0_35px_120px_rgba(79,70,229,0.22)]">
           <div
-            className="flex items-center justify-between mb-6 p-4 rounded-[1.4rem] border border-cyan-200/70 shadow-sm"
-            style={{
-              background: 'linear-gradient(135deg, rgba(14,165,233,0.94), rgba(99,102,241,0.92) 45%, rgba(16,185,129,0.94))'
-            }}
+            className="flex items-center justify-between mb-6 p-4 rounded-[1.4rem] border border-cyan-200/70 shadow-sm bg-gradient-to-r from-cyan-500 via-indigo-600 to-emerald-500"
           >
             <h2 className="text-white text-xl font-bold">
             {usuarioEdicao ? "Editar Perfil" : "Novo Usuário"}
           </h2>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Fechar"
             className="text-white hover:bg-white/20 rounded-2xl p-2 transition-colors duration-200"
           >
             <X className="w-6 h-6" />
@@ -182,7 +186,7 @@ export default function CadastroUsuario({
           )}
 
           <div>
-            <label className="block text-slate-900 mb-2 font-semibold">
+            <label htmlFor="nome-usuario" className="block text-slate-900 mb-2 font-semibold">
               Nome Completo
             </label>
             <div className="relative">
@@ -190,6 +194,7 @@ export default function CadastroUsuario({
                 <User className="w-5 h-5 text-cyan-700" />
               </div>
               <input
+                id="nome-usuario"
                 type="text"
                 value={nome}
                 onChange={(e) => setNome(e.target.value)}
@@ -200,7 +205,7 @@ export default function CadastroUsuario({
           </div>
 
           <div>
-            <label className="block text-slate-900 mb-2 font-semibold">
+            <label htmlFor="email-usuario" className="block text-slate-900 mb-2 font-semibold">
               Email
             </label>
             <div className="relative">
@@ -208,6 +213,7 @@ export default function CadastroUsuario({
                 <Mail className="w-5 h-5 text-cyan-700" />
               </div>
               <input
+                id="email-usuario"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -220,7 +226,7 @@ export default function CadastroUsuario({
           {permitirEscolherTipo && (
             <div>
               <div className="flex items-center justify-between gap-4 mb-2">
-                <label className="block text-slate-900 font-semibold">
+                <label htmlFor="tipo-usuario" className="block text-slate-900 font-semibold">
                   Tipo de Usuário
                 </label>
                 <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${tipoBadgeClasses}`}>
@@ -232,6 +238,7 @@ export default function CadastroUsuario({
                   <Shield className="w-5 h-5 text-cyan-700" />
                 </div>
                 <select
+                  id="tipo-usuario"
                   value={tipo}
                   onChange={(e) =>
                     setTipo(e.target.value as "adm" | "tecnico")
@@ -247,10 +254,11 @@ export default function CadastroUsuario({
 
           {tipo === "tecnico" && (
             <div className="bg-gradient-to-r from-blue-50 to-cyan-50 p-4 rounded-2xl border-2 border-blue-300 shadow-sm">
-              <label className="block text-blue-900 mb-2 font-bold">
+              <label htmlFor="numero-conselho" className="block text-blue-900 mb-2 font-bold">
                 Número do Conselho <span className="text-red-600">*</span>
               </label>
               <input
+                id="numero-conselho"
                 type="text"
                 value={numeroConselho}
                 onChange={(e) => setNumeroConselho(e.target.value)}
@@ -265,7 +273,7 @@ export default function CadastroUsuario({
           )}
 
           <div>
-            <label className="block text-slate-900 mb-2 font-semibold">
+            <label htmlFor="senha-usuario" className="block text-slate-900 mb-2 font-semibold">
               {usuarioEdicao ? "Nova Senha (opcional)" : "Senha"}
             </label>
             <div className="relative">
@@ -273,6 +281,7 @@ export default function CadastroUsuario({
                 <Lock className="w-5 h-5 text-cyan-700" />
               </div>
               <input
+                id="senha-usuario"
                 type={mostrarSenha ? "text" : "password"}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -280,6 +289,7 @@ export default function CadastroUsuario({
               />
               <button
                 type="button"
+                aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
                 onClick={() => setMostrarSenha(!mostrarSenha)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-700 hover:text-cyan-900 bg-cyan-100 p-2 rounded-2xl hover:bg-cyan-200 transition-colors duration-200"
               >
@@ -293,7 +303,7 @@ export default function CadastroUsuario({
           </div>
 
           <div>
-            <label className="block text-slate-900 mb-2 font-semibold">
+            <label htmlFor="confirmar-senha-usuario" className="block text-slate-900 mb-2 font-semibold">
               Confirmar Senha
             </label>
             <div className="relative">
@@ -301,6 +311,7 @@ export default function CadastroUsuario({
                 <Lock className="w-5 h-5 text-cyan-700" />
               </div>
               <input
+                id="confirmar-senha-usuario"
                 type={
                   mostrarConfirmarSenha ? "text" : "password"
                 }
@@ -312,6 +323,7 @@ export default function CadastroUsuario({
               />
               <button
                 type="button"
+                aria-label={mostrarConfirmarSenha ? "Ocultar confirmação de senha" : "Mostrar confirmação de senha"}
                 onClick={() =>
                   setMostrarConfirmarSenha(
                     !mostrarConfirmarSenha,
@@ -330,10 +342,7 @@ export default function CadastroUsuario({
 
           <button
             type="submit"
-            className="w-full text-white py-3.5 rounded-2xl font-bold shadow-2xl shadow-cyan-500/30 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_25px_60px_rgba(56,189,248,0.35)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-            style={{
-              background: 'linear-gradient(135deg, #06b6d4 0%, #6366f1 45%, #14b8a6 100%)'
-            }}
+            className="w-full text-white py-3.5 rounded-2xl font-bold shadow-2xl shadow-cyan-500/30 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_25px_60px_rgba(56,189,248,0.35)] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none bg-gradient-to-r from-cyan-500 via-indigo-600 to-teal-500"
           >
             {usuarioEdicao ? "Salvar Alterações" : "Criar Usuário"}
           </button>

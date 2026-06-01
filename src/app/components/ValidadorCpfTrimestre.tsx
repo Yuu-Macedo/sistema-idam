@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { AlertCircle, CheckCircle, Calendar, TrendingUp, User } from "lucide-react";
 
 interface Produtor {
@@ -44,48 +44,54 @@ export default function ValidadorCpfTrimestre({
     }
   };
 
+  const verificarCpf = useCallback(
+    (cpfValue: string) => {
+      setVerificando(true);
+      const cpfLimpo = limparCpf(cpfValue);
+
+      const produtores = carregarProdutores();
+      const produtorEncontrado = produtores.find(
+        (p: Produtor) => limparCpf(String(p.cpf)) === cpfLimpo
+      );
+
+      if (produtorEncontrado) {
+        const trimestreEncontrado = produtorEncontrado.trimestre || trimestreAtual;
+        const anoEncontrado =
+          produtorEncontrado.anoTrimestre || anoAtual || new Date().getFullYear().toString();
+
+        setProdutorExistente(produtorEncontrado);
+        setTrimestre(trimestreEncontrado);
+        setAno(anoEncontrado);
+        onProdutorEncontrado(produtorEncontrado);
+        onTrimestreChange(trimestreEncontrado, anoEncontrado);
+      } else {
+        const anoPadrao = anoAtual || new Date().getFullYear().toString();
+
+        setProdutorExistente(null);
+        setTrimestre(trimestreAtual);
+        setAno(anoPadrao);
+        onNovoCadastro();
+        onTrimestreChange(trimestreAtual, anoPadrao);
+      }
+
+      setVerificando(false);
+    },
+    [anoAtual, onNovoCadastro, onProdutorEncontrado, onTrimestreChange, trimestreAtual]
+  );
+
   useEffect(() => {
     const cpfLimpo = limparCpf(cpf);
 
     if (cpfLimpo.length === 11) {
-      verificarCpf(cpfLimpo);
+      queueMicrotask(() => verificarCpf(cpfLimpo));
     } else {
-      setProdutorExistente(null);
-      setTrimestre(trimestreAtual);
-      setAno(anoAtual || new Date().getFullYear().toString());
+      queueMicrotask(() => {
+        setProdutorExistente(null);
+        setTrimestre(trimestreAtual);
+        setAno(anoAtual || new Date().getFullYear().toString());
+      });
     }
-  }, [cpf, trimestreAtual, anoAtual]);
-
-  const verificarCpf = (cpfValue: string) => {
-    setVerificando(true);
-    const cpfLimpo = limparCpf(cpfValue);
-
-    const produtores = carregarProdutores();
-    const produtorEncontrado = produtores.find(
-      (p: Produtor) => limparCpf(p.cpf) === cpfLimpo
-    );
-
-    if (produtorEncontrado) {
-      const trimestreEncontrado = produtorEncontrado.trimestre || trimestreAtual;
-      const anoEncontrado = produtorEncontrado.anoTrimestre || anoAtual || new Date().getFullYear().toString();
-
-      setProdutorExistente(produtorEncontrado);
-      setTrimestre(trimestreEncontrado);
-      setAno(anoEncontrado);
-      onProdutorEncontrado(produtorEncontrado);
-      onTrimestreChange(trimestreEncontrado, anoEncontrado);
-    } else {
-      const anoPadrao = anoAtual || new Date().getFullYear().toString();
-
-      setProdutorExistente(null);
-      setTrimestre(trimestreAtual);
-      setAno(anoPadrao);
-      onNovoCadastro();
-      onTrimestreChange(trimestreAtual, anoPadrao);
-    }
-
-    setVerificando(false);
-  };
+  }, [cpf, trimestreAtual, anoAtual, verificarCpf]);
 
   const proximoTrimestre = () => {
     if (produtorExistente) {
@@ -227,10 +233,11 @@ export default function ValidadorCpfTrimestre({
 
             {/* Ano */}
             <div>
-              <label className="text-sm font-medium text-foreground block mb-2">
+              <label htmlFor="ano-trimestre" className="text-sm font-medium text-foreground block mb-2">
                 Ano:
               </label>
               <select
+                id="ano-trimestre"
                 value={ano}
                 onChange={(e) => {
                   setAno(e.target.value);

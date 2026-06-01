@@ -71,29 +71,16 @@ export default function Login({ onLogin }: LoginProps) {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: 'linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 50%, #a5d6a7 100%)'
-      }}
+      className="min-h-screen flex items-center justify-center p-4 bg-[linear-gradient(135deg,_#e8f5e9_0%,_#c8e6c9_50%,_#a5d6a7_100%)]"
     >
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div
-            className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4 shadow-2xl"
-            style={{
-              background: 'linear-gradient(135deg, #2d6a3e 0%, #43a047 50%, #66bb6a 100%)'
-            }}
+            className="inline-flex items-center justify-center w-24 h-24 rounded-full mb-4 shadow-2xl bg-[linear-gradient(135deg,_#2d6a3e_0%,_#43a047_50%,_#66bb6a_100%)]"
           >
             <Leaf className="w-14 h-14 text-white" />
           </div>
-          <h1 className="text-3xl font-bold mb-2"
-            style={{
-              background: 'linear-gradient(135deg, #2d6a3e 0%, #43a047 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text'
-            }}
-          >
+          <h1 className="text-3xl font-bold mb-2 bg-[linear-gradient(135deg,_#2d6a3e_0%,_#43a047_100%)] bg-clip-text text-transparent">
             Sistema de Cadastro Rural
           </h1>
           <p className="text-gray-700 text-lg">
@@ -160,10 +147,7 @@ export default function Login({ onLogin }: LoginProps) {
 
             <button
               type="submit"
-              className="w-full text-white py-3.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all"
-              style={{
-                background: 'linear-gradient(135deg, #2d6a3e 0%, #43a047 50%, #66bb6a 100%)'
-              }}
+              className="w-full text-white py-3.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all bg-[linear-gradient(135deg,_#2d6a3e_0%,_#43a047_50%,_#66bb6a_100%)]"
             >
               Entrar
             </button>

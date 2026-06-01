@@ -30,10 +30,11 @@ export default function CampoLocalizacao({ dados, onChange }: CampoLocalizacaoPr
     <div className="space-y-5">
       {/* TIPO DE LOCALIZAÇÃO */}
       <div>
-        <label className="block text-sm font-semibold text-foreground mb-2">
+        <label htmlFor="tipo-localizacao" className="block text-sm font-semibold text-foreground mb-2">
           Tipo de Localização <span className="text-red-500">*</span>
         </label>
         <select
+          id="tipo-localizacao"
           required
           value={dados.tipoLocalizacao}
           onChange={(e) => {
@@ -114,7 +115,7 @@ export default function CampoLocalizacao({ dados, onChange }: CampoLocalizacaoPr
           {/* MARGEM (para rios, lagos, igarapés, rodovias, ramais) */}
           {tipoSelecionado?.exigeMargem && (
             <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-              <label className="block text-sm font-semibold text-green-900 mb-2">
+              <label htmlFor="margem-localizacao" className="block text-sm font-semibold text-green-900 mb-2">
                 {dados.tipoLocalizacao === "rodovia" || dados.tipoLocalizacao === "ramal" || dados.tipoLocalizacao === "estrada_vicinal"
                   ? "Lado da Via"
                   : "Margem"}
@@ -122,6 +123,7 @@ export default function CampoLocalizacao({ dados, onChange }: CampoLocalizacaoPr
                 <span className="text-red-500">*</span>
               </label>
               <select
+                id="margem-localizacao"
                 required
                 value={dados.margem}
                 onChange={(e) => onChange({ ...dados, margem: e.target.value })}
