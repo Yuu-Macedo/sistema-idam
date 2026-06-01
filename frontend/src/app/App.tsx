@@ -6,31 +6,24 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
-import { AppRoutes } from "./AppRoutes";
-import { AppFooter } from "./components/layout/AppFooter";
-import { AppHeader } from "./components/layout/AppHeader";
-import { AppSidebar } from "./components/layout/AppSidebar";
-import { LoadingRoute } from "./components/layout/LoadingRoute";
-import { MobileMenu } from "./components/layout/MobileMenu";
-import { WorkspaceBanner } from "./components/layout/WorkspaceBanner";
-import { getMenuLinks, rotasAdmin, rotasTecnico } from "./navigation";
-import type { Tab, TipoUsuario, UsuarioLogado } from "./types";
+import { LoadingRoute } from "../components/layout/LoadingRoute";
+import { AppShell } from "./layout/AppShell";
+import {
+  getMenuGroups,
+  getMenuLinks,
+  rotasAdmin,
+  rotasTecnico,
+} from "./routes/navigation";
+import type { Tab, UsuarioLogado } from "../types/app";
+import {
+  clearUsuarioLogado,
+  ensureDefaultAdmin,
+  findUsuarioByCredentials,
+  getUsuarioLogado,
+  saveUsuarioLogado,
+} from "../services/authStorage";
 
-const Login = lazy(() => import("./pages/LoginPage"));
-const CadastroUsuario = lazy(() => import("./components/CadastroUsuario"));
-
-const getInitialUsuarioLogado = (): UsuarioLogado | null => {
-  const usuario = localStorage.getItem("usuarioLogado");
-  if (!usuario) return null;
-
-  const dados = JSON.parse(usuario);
-  return {
-    id: String(dados.id),
-    nome: String(dados.nome),
-    email: String(dados.email),
-    tipo: (dados.tipo || "tecnico") as TipoUsuario,
-  };
-};
+const Login = lazy(() => import("../pages/Auth/LoginPage"));
 
 function getHomePath(usuario: UsuarioLogado | null) {
   if (!usuario) return "/login";
@@ -41,11 +34,12 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [usuarioLogado, setUsuarioLogado] =
-    useState<UsuarioLogado | null>(getInitialUsuarioLogado);
+    useState<UsuarioLogado | null>(getUsuarioLogado);
   const [menuPerfilAberto, setMenuPerfilAberto] = useState(false);
   const [modalNovoUsuario, setModalNovoUsuario] = useState(false);
   const [modalMeuPerfil, setModalMeuPerfil] = useState(false);
   const [menuMobileAberto, setMenuMobileAberto] = useState(false);
+  const [sidebarRecolhida, setSidebarRecolhida] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isAdm = usuarioLogado?.tipo === "adm";
@@ -56,33 +50,7 @@ export default function App() {
   }, [location.pathname, rotasPermitidas]);
 
   useEffect(() => {
-    type UsuarioSalvo = {
-      email?: string;
-    };
-
-    const usuariosSalvos = JSON.parse(
-      localStorage.getItem("usuarios") || "[]",
-    ) as UsuarioSalvo[];
-
-    const existeAdm = usuariosSalvos.some(
-      (u) => u.email === "brunoguilherme@gmail.com",
-    );
-
-    if (!existeAdm) {
-      const admPadrao = {
-        id: "1",
-        nome: "adm1",
-        email: "brunoguilherme@gmail.com",
-        senha: "adm123",
-        tipo: "adm",
-        dataCadastro: new Date().toISOString(),
-      };
-
-      localStorage.setItem(
-        "usuarios",
-        JSON.stringify([admPadrao, ...usuariosSalvos]),
-      );
-    }
+    ensureDefaultAdmin();
   }, []);
 
   useEffect(() => {
@@ -97,18 +65,7 @@ export default function App() {
   }, []);
 
   const atualizarUsuarioLogado = () => {
-    const usuario = localStorage.getItem("usuarioLogado");
-
-    if (usuario) {
-      const dados = JSON.parse(usuario);
-
-      setUsuarioLogado({
-        id: dados.id,
-        nome: dados.nome,
-        email: dados.email,
-        tipo: (dados.tipo || "tecnico") as TipoUsuario,
-      });
-    }
+    setUsuarioLogado(getUsuarioLogado());
   };
 
   const handleLogin = (
@@ -117,58 +74,23 @@ export default function App() {
     usuarioRecebido?: UsuarioLogado,
   ) => {
     if (usuarioRecebido) {
-      localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify({
-          ...usuarioRecebido,
-          loginTime: new Date().toISOString(),
-        }),
-      );
-
+      saveUsuarioLogado(usuarioRecebido);
       setUsuarioLogado(usuarioRecebido);
       navigate(getHomePath(usuarioRecebido), { replace: true });
       return;
     }
 
-    type UsuarioSalvoLogin = {
-      id?: string;
-      nome?: string;
-      email?: string;
-      senha?: string;
-      tipo?: string;
-    };
-
-    const usuarios = JSON.parse(
-      localStorage.getItem("usuarios") || "[]",
-    ) as UsuarioSalvoLogin[];
-
-    const usuario = usuarios.find(
-      (u) => u.email === email && u.senha === senha,
-    );
+    const usuario = findUsuarioByCredentials(email, senha);
 
     if (usuario) {
-      const dadosUsuario: UsuarioLogado = {
-        id: usuario.id || "",
-        email: usuario.email || "",
-        nome: usuario.nome || "",
-        tipo: (usuario.tipo || "tecnico") as TipoUsuario,
-      };
-
-      localStorage.setItem(
-        "usuarioLogado",
-        JSON.stringify({
-          ...dadosUsuario,
-          loginTime: new Date().toISOString(),
-        }),
-      );
-
-      setUsuarioLogado(dadosUsuario);
-      navigate(getHomePath(dadosUsuario), { replace: true });
+      saveUsuarioLogado(usuario);
+      setUsuarioLogado(usuario);
+      navigate(getHomePath(usuario), { replace: true });
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("usuarioLogado");
+    clearUsuarioLogado();
     setUsuarioLogado(null);
     setMenuPerfilAberto(false);
     setMenuMobileAberto(false);
@@ -176,6 +98,7 @@ export default function App() {
   };
 
   const menuLinks = getMenuLinks(isAdm);
+  const menuGroups = getMenuGroups(isAdm);
   const visibleMenuLinks = menuLinks.filter((item) => item.visible);
   const activeMenuItem = menuLinks.find((item) => item.key === activeTab);
   const homePath = getHomePath(usuarioLogado);
@@ -193,76 +116,40 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f0e7] text-[#13251d]">
-      <AppHeader
-        activeMenuItem={activeMenuItem}
-        isAdm={isAdm}
-        menuPerfilAberto={menuPerfilAberto}
-        menuRef={menuRef}
-        usuarioLogado={usuarioLogado}
-        onLogout={handleLogout}
-        onOpenMeuPerfil={() => {
-          setModalMeuPerfil(true);
-          setMenuPerfilAberto(false);
-        }}
-        onOpenMobileMenu={() => setMenuMobileAberto(true)}
-        onOpenNovoUsuario={() => {
-          setModalNovoUsuario(true);
-          setMenuPerfilAberto(false);
-        }}
-        onTogglePerfil={() => setMenuPerfilAberto(!menuPerfilAberto)}
-      />
-
-      <MobileMenu
-        aberto={menuMobileAberto}
-        activeTab={activeTab}
-        visibleMenuLinks={visibleMenuLinks}
-        onClose={() => setMenuMobileAberto(false)}
-        onLogout={handleLogout}
-        onNavigate={navigateToTab}
-      />
-
-      <div className="flex min-w-0 gap-5 lg:items-start">
-        <AppSidebar
-          activeTab={activeTab}
-          visibleMenuLinks={visibleMenuLinks}
-          onNavigate={navigateToTab}
-        />
-
-        <main className="app-content min-w-0 flex-1 px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">
-          <WorkspaceBanner activeMenuItem={activeMenuItem} />
-
-          <AppRoutes
-            homePath={homePath}
-            isAdm={isAdm}
-            usuarioLogado={usuarioLogado}
-          />
-        </main>
-      </div>
-
-      <AppFooter />
-
-      <Suspense fallback={null}>
-        {modalNovoUsuario && isAdm && (
-          <CadastroUsuario
-            onClose={() => setModalNovoUsuario(false)}
-            onSalvar={atualizarUsuarioLogado}
-            permitirEscolherTipo={true}
-          />
-        )}
-
-        {modalMeuPerfil && usuarioLogado && (
-          <CadastroUsuario
-            onClose={() => {
-              setModalMeuPerfil(false);
-              atualizarUsuarioLogado();
-            }}
-            onSalvar={atualizarUsuarioLogado}
-            usuarioEdicao={usuarioLogado}
-            permitirEscolherTipo={isAdm}
-          />
-        )}
-      </Suspense>
-    </div>
+    <AppShell
+      activeMenuItem={activeMenuItem}
+      activeTab={activeTab}
+      homePath={homePath}
+      isAdm={isAdm}
+      menuMobileAberto={menuMobileAberto}
+      menuPerfilAberto={menuPerfilAberto}
+      menuRef={menuRef}
+      modalMeuPerfil={modalMeuPerfil}
+      modalNovoUsuario={modalNovoUsuario}
+      sidebarRecolhida={sidebarRecolhida}
+      usuarioLogado={usuarioLogado}
+      menuGroups={menuGroups}
+      visibleMenuLinks={visibleMenuLinks}
+      onAtualizarUsuarioLogado={atualizarUsuarioLogado}
+      onCloseMeuPerfil={() => {
+        setModalMeuPerfil(false);
+        atualizarUsuarioLogado();
+      }}
+      onCloseMobileMenu={() => setMenuMobileAberto(false)}
+      onCloseNovoUsuario={() => setModalNovoUsuario(false)}
+      onLogout={handleLogout}
+      onNavigate={navigateToTab}
+      onOpenMeuPerfil={() => {
+        setModalMeuPerfil(true);
+        setMenuPerfilAberto(false);
+      }}
+      onOpenMobileMenu={() => setMenuMobileAberto(true)}
+      onOpenNovoUsuario={() => {
+        setModalNovoUsuario(true);
+        setMenuPerfilAberto(false);
+      }}
+      onToggleSidebar={() => setSidebarRecolhida((atual) => !atual)}
+      onTogglePerfil={() => setMenuPerfilAberto(!menuPerfilAberto)}
+    />
   );
 }
