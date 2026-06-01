@@ -3941,7 +3941,83 @@ export default function CadastroProdutor() {
                   Informações do registro oficial
                 </p>
               </div>
+              {/* Carteira do Produtor */}
+                  <div className="rounded-xl border border-border p-4 space-y-4">
+                    <label className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={
+                          formData.possuiCarteiraProdutor ||
+                          false
+                        }
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            possuiCarteiraProdutor:
+                              e.target.checked,
+                            numeroCarteiraProdutor: e.target
+                              .checked
+                              ? formData.numeroCarteiraProdutor
+                              : "",
+                            vencimentoCarteiraProdutor: e.target
+                              .checked
+                              ? formData.vencimentoCarteiraProdutor
+                              : "",
+                          })
+                        }
+                        className="w-4 h-4"
+                      />
+                      <span className="text-foreground font-medium">
+                        Possui Carteira do Produtor
+                      </span>
+                    </label>
 
+                    {formData.possuiCarteiraProdutor && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-foreground mb-2" id="numeroCarteiraProdutor">
+                            Número da Carteira do Produtor
+                          </label>
+                          <input
+                            aria-labelledby="numeroCarteiraProdutor"
+                            type="text"
+                            value={
+                              formData.numeroCarteiraProdutor
+                            }
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                numeroCarteiraProdutor:
+                                  e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-foreground mb-2" id="vencimentoCarteiraProdutor">
+                            Data de Vencimento da Carteira
+                          </label>
+                          <input
+                            aria-labelledby="vencimentoCarteiraProdutor"
+                            type="date"
+                            value={
+                              formData.vencimentoCarteiraProdutor
+                            }
+                            onChange={(e) =>
+                              setFormData({
+                                ...formData,
+                                vencimentoCarteiraProdutor:
+                                  e.target.value,
+                              })
+                            }
+                            className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div>
                   <label className="block text-foreground mb-2">
@@ -4233,84 +4309,6 @@ export default function CadastroProdutor() {
                               setFormData({
                                 ...formData,
                                 dataInscricaoCar:
-                                  e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Carteira do Produtor */}
-                  <div className="rounded-xl border border-border p-4 space-y-4">
-                    <label className="flex items-center gap-3">
-                      <input
-                        type="checkbox"
-                        checked={
-                          formData.possuiCarteiraProdutor ||
-                          false
-                        }
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            possuiCarteiraProdutor:
-                              e.target.checked,
-                            numeroCarteiraProdutor: e.target
-                              .checked
-                              ? formData.numeroCarteiraProdutor
-                              : "",
-                            vencimentoCarteiraProdutor: e.target
-                              .checked
-                              ? formData.vencimentoCarteiraProdutor
-                              : "",
-                          })
-                        }
-                        className="w-4 h-4"
-                      />
-                      <span className="text-foreground font-medium">
-                        Possui Carteira do Produtor
-                      </span>
-                    </label>
-
-                    {formData.possuiCarteiraProdutor && (
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-foreground mb-2" id="numeroCarteiraProdutor">
-                            Número da Carteira do Produtor
-                          </label>
-                          <input
-                            aria-labelledby="numeroCarteiraProdutor"
-                            type="text"
-                            value={
-                              formData.numeroCarteiraProdutor
-                            }
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                numeroCarteiraProdutor:
-                                  e.target.value,
-                              })
-                            }
-                            className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-foreground mb-2" id="vencimentoCarteiraProdutor">
-                            Data de Vencimento da Carteira
-                          </label>
-                          <input
-                            aria-labelledby="vencimentoCarteiraProdutor"
-                            type="date"
-                            value={
-                              formData.vencimentoCarteiraProdutor
-                            }
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                vencimentoCarteiraProdutor:
                                   e.target.value,
                               })
                             }
