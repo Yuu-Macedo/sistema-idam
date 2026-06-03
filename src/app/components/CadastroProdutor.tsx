@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 type CulturaAgricola = {
   id: string;
   nome: string;
@@ -7,7 +9,7 @@ type CulturaAgricola = {
   producaoTotal: string;
 };
 
-import { useState } from "react";
+
 import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "./ui/badge";
 
@@ -69,6 +71,7 @@ interface CadastroProdutorFormData {
     tipos: string[];
   }[];
 
+  culturas: CulturaAgricola[];
   atividadePrincipal: string;
   atividadeSecundaria: string;
   outrasProducoes: string;
@@ -216,18 +219,51 @@ export default function CadastroProdutor() {
   const [mostrarListaProdutores, setMostrarListaProdutores] = useState(false);
 
   const adicionarCultura = () => {
-  setCulturas([
-    ...culturas,
-    {
-      id: crypto.randomUUID(),
-      nome: "",
-      tipo: "",
-      areaPlantada: "",
-      produtividadeMedia: "",
-      producaoTotal: "",
-    },
-  ]);
-};
+    setCulturas((atual) => [
+      ...atual,
+      {
+        id: crypto.randomUUID(),
+        nome: "",
+        tipo: "",
+        areaPlantada: "",
+        produtividadeMedia: "",
+        producaoTotal: "",
+      },
+    ]);
+  };
+
+  const atualizarCultura = (
+    id: string,
+    campo: keyof CulturaAgricola,
+    valor: string,
+  ) => {
+    setCulturas((atual) =>
+      atual.map((cultura) => {
+        if (cultura.id !== id) return cultura;
+
+        const culturaAtualizada = {
+          ...cultura,
+          [campo]: valor,
+        };
+
+        const area = Number(culturaAtualizada.areaPlantada);
+        const produtividade = Number(culturaAtualizada.produtividadeMedia);
+
+        if (!Number.isNaN(area) && !Number.isNaN(produtividade)) {
+          culturaAtualizada.producaoTotal = String(area * produtividade);
+        } else {
+          culturaAtualizada.producaoTotal = "";
+        }
+
+        return culturaAtualizada;
+      }),
+    );
+  };
+
+  const removerCultura = (id: string) => {
+    setCulturas((atual) => atual.filter((cultura) => cultura.id !== id));
+  };
+
   const totalSteps = 7;
   const [formData, setFormData] =
     useState<CadastroProdutorFormData>({
@@ -267,6 +303,7 @@ export default function CadastroProdutor() {
       comunidade: "",
       perfil: [],
       atividades: [],
+      culturas: [],
       situacaoImovel: "",
       caracteristicas: [],
       nomeImovel: "",
@@ -616,7 +653,11 @@ export default function CadastroProdutor() {
     const produtor = produtores.find((p: any) => p.id === produtorId);
 
     if (produtor) {
-      setFormData(produtor);
+      setFormData({
+        ...produtor,
+        culturas: Array.isArray(produtor.culturas) ? produtor.culturas : [],
+      });
+      setCulturas(Array.isArray(produtor.culturas) ? produtor.culturas : []);
       setProdutorEmEdicaoId(produtorId);
       setModoEdicao(true);
       setCurrentStep(1);
@@ -626,6 +667,7 @@ export default function CadastroProdutor() {
   const cancelarEdicao = () => {
     setModoEdicao(false);
     setProdutorEmEdicaoId(null);
+    setCulturas([]);
     setCurrentStep(1);
     // Resetar formulário para valores iniciais
     setFormData({
@@ -659,6 +701,7 @@ export default function CadastroProdutor() {
       situacaoImovel: "",
       caracteristicas: [],
       atividades: [],
+      culturas: [],
       atividadePrincipal: "",
       atividadeSecundaria: "",
       outrasProducoes: "",
@@ -787,6 +830,7 @@ export default function CadastroProdutor() {
           ? {
               ...p,
               ...formData,
+              culturas,
               dataAtualizacao: new Date().toISOString(),
             }
           : p,
@@ -801,6 +845,7 @@ export default function CadastroProdutor() {
     } else {
       const novoProdutor = {
         ...formData,
+        culturas,
         id: Date.now().toString(),
         dataCadastro: new Date().toISOString(),
 
@@ -849,6 +894,7 @@ export default function CadastroProdutor() {
       comunidade: "",
       perfil: [],
       atividades: [],
+      culturas: [],
       situacaoImovel: "",
       caracteristicas: [],
       nomeImovel: "",
@@ -960,6 +1006,7 @@ export default function CadastroProdutor() {
       dataAtualizacao: "",
     });
 
+    setCulturas([]);
     setModoEdicao(false);
     setProdutorEmEdicaoId(null);
     setCurrentStep(1);
@@ -2381,6 +2428,144 @@ export default function CadastroProdutor() {
                 </p>
               </div>
 
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-200 bg-emerald-50 p-4">
+                <div>
+                  <h3 className="font-semibold text-emerald-800">
+                    Culturas agrícolas
+                  </h3>
+                  <p className="text-sm text-emerald-700">
+                    Adicione uma ou mais culturas e o sistema calculará a produção total.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={adicionarCultura}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 font-semibold text-white transition-all hover:bg-emerald-700"
+                >
+                  + Adicionar Cultura
+                </button>
+              </div>
+
+              {culturas.length === 0 ? (
+                <div className="mb-5 rounded-lg border border-dashed border-emerald-300 bg-emerald-50/60 p-4 text-sm text-emerald-700">
+                  Nenhuma cultura adicionada ainda.
+                </div>
+              ) : (
+                <div className="mb-6 space-y-4">
+                  {culturas.map((cultura, index) => (
+                    <div
+                      key={cultura.id}
+                      className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 shadow-sm"
+                    >
+                      <div className="mb-4 flex items-center justify-between gap-3">
+                        <h3 className="font-semibold text-emerald-800">
+                          Cultura {index + 1}
+                        </h3>
+
+                        <button
+                          type="button"
+                          onClick={() => removerCultura(cultura.id)}
+                          className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
+                        >
+                          Remover
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div>
+                          <label className="mb-2 block text-foreground">
+                            Nome da cultura
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Ex: Mandioca, milho, banana..."
+                            value={cultura.nome}
+                            onChange={(e) =>
+                              atualizarCultura(cultura.id, "nome", e.target.value)
+                            }
+                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-foreground">
+                            Tipo da cultura
+                          </label>
+                          <select
+                            value={cultura.tipo}
+                            onChange={(e) =>
+                              atualizarCultura(cultura.id, "tipo", e.target.value)
+                            }
+                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                          >
+                            <option value="">Selecione</option>
+                            <option value="Subsistência">Subsistência</option>
+                            <option value="Comercial">Comercial</option>
+                            <option value="Industrial">Industrial</option>
+                            <option value="Orgânica">Orgânica</option>
+                            <option value="Familiar">Familiar</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-foreground">
+                            Área plantada
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="Ex: 2.5"
+                            value={cultura.areaPlantada}
+                            onChange={(e) =>
+                              atualizarCultura(
+                                cultura.id,
+                                "areaPlantada",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-foreground">
+                            Produtividade média
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="Ex: 1000"
+                            value={cultura.produtividadeMedia}
+                            onChange={(e) =>
+                              atualizarCultura(
+                                cultura.id,
+                                "produtividadeMedia",
+                                e.target.value,
+                              )
+                            }
+                            className="w-full rounded-lg border border-border bg-white px-4 py-2.5 focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="mb-2 block text-foreground">
+                            Produção total
+                          </label>
+                          <input
+                            type="text"
+                            readOnly
+                            value={cultura.producaoTotal}
+                            placeholder="Calculado automaticamente"
+                            className="w-full rounded-lg border border-border bg-gray-100 px-4 py-2.5 text-muted-foreground"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-foreground mb-2">
@@ -2398,6 +2583,7 @@ export default function CadastroProdutor() {
                     className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   />
                 </div>
+
                 <div>
                   <label className="block text-foreground mb-2">
                     Atividade Secundária
@@ -2414,6 +2600,7 @@ export default function CadastroProdutor() {
                     className="w-full px-4 py-2.5 bg-input-background rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary transition-all"
                   />
                 </div>
+
                 <div className="md:col-span-2">
                   <label className="block text-foreground mb-2">
                     Outras Produções

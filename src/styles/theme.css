@@ -230,3 +230,66 @@
     line-height: 1.5;
   }
 }
+
+/* Custom visual enhancements */
+[data-slot="card"] {
+  position: relative;
+}
+
+[data-slot="card"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+  background: transparent;
+  transition: background-color 200ms ease, opacity 200ms ease;
+  opacity: 0.95;
+}
+
+[data-slot="card"][data-color="green"]::before {
+  background: linear-gradient(180deg, var(--color-teal) 0%, color-mix(in srgb, var(--color-teal) 70%, white 30%) 100%);
+}
+
+[data-slot="card"][data-color="blue"]::before {
+  background: linear-gradient(180deg, var(--color-blue) 0%, color-mix(in srgb, var(--color-blue) 70%, white 30%) 100%);
+}
+
+[data-slot="card"][data-color="purple"]::before {
+  background: linear-gradient(180deg, var(--color-purple) 0%, color-mix(in srgb, var(--color-purple) 70%, white 30%) 100%);
+}
+
+[data-slot="card"][data-color="amber"]::before {
+  background: linear-gradient(180deg, var(--color-amber) 0%, color-mix(in srgb, var(--color-amber) 70%, white 30%) 100%);
+}
+
+[data-slot="card"][data-color="red"]::before {
+  background: linear-gradient(180deg, var(--color-destructive) 0%, color-mix(in srgb, var(--color-destructive) 70%, white 30%) 100%);
+}
+
+[data-slot="card"]:hover {
+  transform: translateY(-3px);
+}
+
+/* Title with icon background */
+[data-slot="card-header"] > [data-slot="card-title"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--color-blue-light) 60%, transparent 40%);
+}
+
+/* Button focus improvements (fallback for browsers that don't support arbitrary color tokens) */
+[data-slot="button"]:focus {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+}
+
+/* Sidebar active indicator slight glow */
+[data-slot="sidebar-menu-button"][data-active="true"] {
+  box-shadow: 0 6px 18px rgba(14, 165, 233, 0.06);
+}
