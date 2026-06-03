@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sistema-idam-db
+    environment:
+      POSTGRES_DB: sistema_idam
+      POSTGRES_USER: idam_user
+      POSTGRES_PASSWORD: idam_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - idam_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U idam_user -d sistema_idam"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sistema-idam-backend
+    environment:
+      SECRET_KEY: dev-only-docker-idam-secret-key
+      DEBUG: "True"
+      DATABASE_URL: postgres://idam_user:idam_password@db:5432/sistema_idam
+      ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0,backend
+      CORS_ALLOWED_ORIGINS: http://localhost:5173,http://127.0.0.1:5173
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["sh", "/app/docker/entrypoint.sh"]
+
+volumes:
+  idam_postgres_data:

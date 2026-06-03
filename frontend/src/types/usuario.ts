@@ -1,4 +1,4 @@
-export type TipoUsuario = "adm" | "tecnico";
+export type TipoUsuario = "adm" | "tecnico" | "visualizador";
 
 export interface UsuarioLogado {
   id: string;

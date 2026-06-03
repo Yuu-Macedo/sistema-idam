@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import RecomendacoesDocumento from "./RecomendacoesDocumento";
 import { Printer } from "lucide-react";
+import { saveRecomendacaoApi } from "../../services/resourcesApi";
 
 interface Produtor {
   nome: string;
@@ -85,7 +86,7 @@ export default function RecomendacoesTecnicas() {
     reader.readAsDataURL(file);
   };
 
-  const handleSalvar = () => {
+  const handleSalvar = async () => {
     if (!produtorSelecionado || !formData.recomendacao) {
       alert("Selecione um produtor e escreva a recomendação.");
       return;
@@ -120,7 +121,12 @@ export default function RecomendacoesTecnicas() {
       dataCriacao: new Date().toISOString(),
     };
 
-    const lista = [nova, ...recomendacoes];
+    const recomendacaoSalva = await saveRecomendacaoApi(nova).catch((error) => {
+      console.warn("API indisponivel, recomendacao salva localmente.", error);
+      return nova;
+    });
+
+    const lista = [recomendacaoSalva, ...recomendacoes];
 
     setRecomendacoes(lista);
 
@@ -130,7 +136,7 @@ export default function RecomendacoesTecnicas() {
     );
 
     // Definir a recomendação recém-criada para visualização
-    setRecomendacaoParaVisualizar(nova);
+    setRecomendacaoParaVisualizar(recomendacaoSalva);
 
     setFormData({
       recomendacao: "",
@@ -143,7 +149,7 @@ export default function RecomendacoesTecnicas() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="idam-form space-y-6">
       {/* 🔍 BUSCA */}
       <div className="bg-card p-6 rounded-xl border">
         <h2 className="font-semibold mb-4">Buscar Produtor</h2>

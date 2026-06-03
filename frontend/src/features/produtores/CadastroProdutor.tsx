@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import {
@@ -11,6 +11,7 @@ import {
   MeliponiculturaList,
   type AbelhaItem,
 } from "./MeliponiculturaList";
+import { fetchProdutoresApi, saveProdutorApi } from "../../services/produtoresApi";
 
 interface CadastroProdutorFormData {
   cadastradoPorId?: string;
@@ -412,6 +413,21 @@ interface Documento {
   base64: string;
 }
 
+const CAMPOS_OBRIGATORIOS_PRODUTOR: Array<{
+  campo: keyof CadastroProdutorFormData;
+  label: string;
+  step: number;
+}> = [
+  { campo: "rg", label: "RG", step: 1 },
+  { campo: "dataNascimento", label: "Data de Nascimento", step: 1 },
+  { campo: "telefone", label: "Telefone", step: 1 },
+  { campo: "sexo", label: "Sexo", step: 1 },
+  { campo: "publico", label: "Publico", step: 1 },
+  { campo: "logradouro", label: "Logradouro e Numero", step: 2 },
+  { campo: "municipio", label: "Municipio", step: 2 },
+  { campo: "uf", label: "UF", step: 2 },
+];
+
 export default function CadastroProdutor() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [modoEdicao, setModoEdicao] = useState(false);
@@ -647,6 +663,23 @@ export default function CadastroProdutor() {
       return [];
     }
   };
+
+  useEffect(() => {
+    let ativo = true;
+
+    fetchProdutoresApi()
+      .then((produtoresApi) => {
+        if (!ativo || produtoresApi.length === 0) return;
+        localStorage.setItem("produtores", JSON.stringify(produtoresApi));
+      })
+      .catch((error) => {
+        console.warn("Não foi possível carregar produtores da API.", error);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const tiposSelecionados = formData.atividades.flatMap(
     (atividade) => atividade.tipos,
@@ -1033,7 +1066,7 @@ export default function CadastroProdutor() {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensagemErro("");
     setMensagemSucesso("");
@@ -1057,6 +1090,16 @@ export default function CadastroProdutor() {
       return;
     }
 
+    const campoObrigatorioVazio = CAMPOS_OBRIGATORIOS_PRODUTOR.find(
+      ({ campo }) => !String(formData[campo] || "").trim(),
+    );
+
+    if (campoObrigatorioVazio) {
+      setMensagemErro(`Informe o campo obrigatorio: ${campoObrigatorioVazio.label}.`);
+      setCurrentStep(campoObrigatorioVazio.step);
+      return;
+    }
+
     const cpfDuplicado = produtores.some(
       (p: Produtor) =>
         limparCpf(p.cpf) === cpfAtualLimpo &&
@@ -1069,44 +1112,61 @@ export default function CadastroProdutor() {
       return;
     }
 
+    const produtorPayload = {
+      ...formData,
+      dataAtualizacao: new Date().toISOString(),
+      cadastradoPorId: usuarioLogado?.id || "",
+      cadastradoPorNome: usuarioLogado?.nome || "",
+      cadastradoPorEmail: usuarioLogado?.email || "",
+      cadastradoPorTipo: usuarioLogado?.tipo || "tecnico",
+    };
 
-    if (modoEdicao && produtorEmEdicaoId) {
-      const atualizados = produtores.map((p: Produtor) =>
-        p.id === produtorEmEdicaoId
-          ? {
-              ...p,
-              ...formData,
-              dataAtualizacao: new Date().toISOString(),
-            }
-          : p,
+    try {
+      const produtorSalvo = await saveProdutorApi(
+        produtorPayload,
+        modoEdicao && produtorEmEdicaoId ? produtorEmEdicaoId : undefined,
       );
 
-      localStorage.setItem(
-        "produtores",
-        JSON.stringify(atualizados),
+      const produtoresAtualizados =
+        modoEdicao && produtorEmEdicaoId
+          ? produtores.map((p: Produtor) =>
+              p.id === produtorEmEdicaoId ? { ...p, ...produtorSalvo } : p,
+            )
+          : [...produtores, produtorSalvo];
+
+      localStorage.setItem("produtores", JSON.stringify(produtoresAtualizados));
+      setMensagemSucesso(
+        modoEdicao
+          ? "Produtor atualizado com sucesso na API."
+          : "Produtor cadastrado com sucesso na API.",
       );
+    } catch (error) {
+      console.warn("API indisponível, salvando produtor localmente.", error);
 
-      setMensagemSucesso("Produtor atualizado com sucesso.");
-    } else {
-      const novoProdutor = {
-        ...formData,
-        id: Date.now().toString(),
-        dataCadastro: new Date().toISOString(),
+      if (modoEdicao && produtorEmEdicaoId) {
+        const atualizados = produtores.map((p: Produtor) =>
+          p.id === produtorEmEdicaoId
+            ? {
+                ...p,
+                ...produtorPayload,
+                dataAtualizacao: new Date().toISOString(),
+              }
+            : p,
+        );
 
-        cadastradoPorId: usuarioLogado?.id || "",
-        cadastradoPorNome: usuarioLogado?.nome || "",
-        cadastradoPorEmail: usuarioLogado?.email || "",
-        cadastradoPorTipo: usuarioLogado?.tipo || "tecnico",
-      };
+        localStorage.setItem("produtores", JSON.stringify(atualizados));
+        setMensagemSucesso("Produtor atualizado localmente.");
+      } else {
+        const novoProdutor = {
+          ...produtorPayload,
+          id: Date.now().toString(),
+          dataCadastro: new Date().toISOString(),
+        };
 
-      produtores.push(novoProdutor);
-
-      localStorage.setItem(
-        "produtores",
-        JSON.stringify(produtores),
-      );
-
-      setMensagemSucesso("Produtor cadastrado com sucesso.");
+        produtores.push(novoProdutor);
+        localStorage.setItem("produtores", JSON.stringify(produtores));
+        setMensagemSucesso("Produtor cadastrado localmente.");
+      }
     }
 
     setFormData({

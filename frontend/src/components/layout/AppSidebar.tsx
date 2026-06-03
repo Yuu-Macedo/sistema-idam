@@ -18,7 +18,7 @@ export function AppSidebar({
 }: AppSidebarProps) {
   return (
     <aside
-      className={`sticky top-16 hidden h-[calc(100vh-4rem)] shrink-0 border-r border-[#d7e0d7] bg-[#123d2d] text-white shadow-xl shadow-[#123d2d]/10 transition-[width] duration-200 lg:block ${
+      className={`sticky top-[4.5rem] hidden h-[calc(100vh-4.5rem)] shrink-0 border-r border-white/10 bg-[#123525] text-white shadow-xl shadow-[#123d2d]/10 transition-[width] duration-200 lg:block ${
         collapsed ? "w-[5.25rem]" : "w-80"
       }`}
       aria-label="Menu principal"
@@ -26,7 +26,7 @@ export function AppSidebar({
       <div className="flex h-full flex-col">
         <div className="border-b border-white/10 p-3">
           <div
-            className={`flex items-center gap-3 rounded-lg bg-white/8 p-3 ${
+            className={`flex items-center gap-3 rounded-xl bg-white/8 p-3 ring-1 ring-white/10 ${
               collapsed ? "justify-center" : ""
             }`}
           >
@@ -109,7 +109,7 @@ export function AppSidebar({
           <button
             type="button"
             onClick={onToggleCollapsed}
-            className={`flex w-full items-center gap-3 rounded-lg border border-white/10 bg-white/8 px-3 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/12 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d9efdf] ${
+            className={`flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/8 px-3 py-2.5 text-sm font-semibold text-white/80 transition hover:bg-white/12 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d9efdf] ${
               collapsed ? "justify-center" : ""
             }`}
             aria-label={collapsed ? "Expandir menu lateral" : "Recolher menu lateral"}

@@ -263,7 +263,7 @@ export default function HistoricoTrimestreComponent() {
         }
       `}</style>
 
-      <div className="space-y-6">
+      <div className="idam-form space-y-6">
         {/* HEADER */}
         <div
           className="rounded-xl p-6 shadow-lg text-white bg-[linear-gradient(135deg,_#6366f1_0%,_#8b5cf6_50%,_#a855f7_100%)]"

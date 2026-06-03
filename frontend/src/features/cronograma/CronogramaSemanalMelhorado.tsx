@@ -12,6 +12,7 @@ import {
   MapPin,
   User,
 } from "lucide-react";
+import { deleteCronogramaApi, saveCronogramaApi } from "../../services/resourcesApi";
 
 interface Atividade {
   id: string;
@@ -244,7 +245,7 @@ export default function CronogramaSemanalMelhorado() {
     setMostrarFormulario(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (
@@ -296,13 +297,21 @@ export default function CronogramaSemanalMelhorado() {
         : undefined,
     };
 
+    const atividadeSalva = await saveCronogramaApi({
+      ...novaAtividade,
+      atividade: novaAtividade.descricaoAtividade,
+    }).catch((error) => {
+      console.warn("API indisponivel, cronograma salvo localmente.", error);
+      return novaAtividade;
+    });
+
     let novasAtividades: Atividade[];
     if (atividadeEditando) {
       novasAtividades = atividades.map((a) =>
-        a.id === atividadeEditando.id ? novaAtividade : a
+        a.id === atividadeEditando.id ? atividadeSalva : a
       );
     } else {
-      novasAtividades = [...atividades, novaAtividade];
+      novasAtividades = [...atividades, atividadeSalva];
     }
 
     setAtividades(novasAtividades);
@@ -337,8 +346,11 @@ export default function CronogramaSemanalMelhorado() {
     setMostrarFormulario(true);
   };
 
-  const handleExcluir = (id: string) => {
+  const handleExcluir = async (id: string) => {
     if (confirm("Deseja realmente excluir esta atividade?")) {
+      await deleteCronogramaApi(id).catch((error) => {
+        console.warn("API indisponivel, cronograma excluido localmente.", error);
+      });
       const novasAtividades = atividades.filter((a) => a.id !== id);
       setAtividades(novasAtividades);
       localStorage.setItem("cronogramas", JSON.stringify(novasAtividades));
@@ -372,7 +384,7 @@ export default function CronogramaSemanalMelhorado() {
   const segunda = getSegundaDaSemana(semanaAtual);
 
   return (
-    <div className="space-y-6">
+    <div className="idam-form space-y-6">
       {/* HEADER */}
       <div className="bg-linear-to-r from-pink-600 to-pink-700 rounded-xl p-6 shadow-lg text-white">
         <div className="flex items-center justify-between">

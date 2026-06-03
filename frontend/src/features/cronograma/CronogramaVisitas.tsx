@@ -9,6 +9,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
+import { deleteCronogramaApi, saveCronogramaApi } from "../../services/resourcesApi";
 
 interface Visita {
   id: string;
@@ -174,7 +175,7 @@ export default function CronogramaVisitas() {
     setSemanaAtual(nova);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const produtor = formData.produtorId
@@ -227,14 +228,19 @@ export default function CronogramaVisitas() {
         : undefined,
     };
 
+    const visitaSalva = await saveCronogramaApi(novaVisita).catch((error) => {
+      console.warn("API indisponivel, visita salva localmente.", error);
+      return novaVisita;
+    });
+
     let novasVisitas: Visita[];
 
     if (visitaEditando) {
       novasVisitas = visitas.map((v) =>
-        v.id === visitaEditando.id ? novaVisita : v,
+        v.id === visitaEditando.id ? visitaSalva : v,
       );
     } else {
-      novasVisitas = [...visitas, novaVisita];
+      novasVisitas = [...visitas, visitaSalva];
     }
 
     setVisitas(novasVisitas);
@@ -287,8 +293,11 @@ export default function CronogramaVisitas() {
     setMostrarFormulario(true);
   };
 
-  const handleExcluir = (id: string) => {
+  const handleExcluir = async (id: string) => {
     if (confirm("Deseja realmente excluir esta visita?")) {
+      await deleteCronogramaApi(id).catch((error) => {
+        console.warn("API indisponivel, visita excluida localmente.", error);
+      });
       const novasVisitas = visitas.filter((v) => v.id !== id);
       setVisitas(novasVisitas);
 
@@ -324,7 +333,7 @@ export default function CronogramaVisitas() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="idam-form space-y-6">
       {/* Header com Navegação de Semana */}
       <div className="bg-card rounded-xl border border-border p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
