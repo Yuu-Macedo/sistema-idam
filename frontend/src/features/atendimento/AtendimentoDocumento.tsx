@@ -584,30 +584,28 @@ export default function AtendimentoDocumento({
           .impressao-documento {
             width: 100% !important;
             max-width: 100% !important;
-            padding: 8px !important;
-            font-size: 7pt !important;
-            line-height: 1.2 !important;
+            padding: 16px !important;
+            font-size: 9.5pt !important;
+            line-height: 1.35 !important;
             page-break-inside: avoid !important;
-            transform: scale(0.85);
-            transform-origin: top left;
           }
 
           .impressao-documento h1 {
-            font-size: 12pt !important;
-            margin-bottom: 4px !important;
+            font-size: 15pt !important;
+            margin-bottom: 8px !important;
           }
 
           .impressao-documento h2 {
-            font-size: 9pt !important;
-            margin-bottom: 3px !important;
-            margin-top: 6px !important;
+            font-size: 12pt !important;
+            margin-bottom: 5px !important;
+            margin-top: 8px !important;
           }
 
           .impressao-documento h3,
           .impressao-documento h4 {
-            font-size: 8pt !important;
-            margin-bottom: 2px !important;
-            margin-top: 3px !important;
+            font-size: 10pt !important;
+            margin-bottom: 4px !important;
+            margin-top: 5px !important;
           }
 
           .impressao-documento .mb-6 {

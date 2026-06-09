@@ -7,16 +7,19 @@ class Produtor(models.Model):
         FEMININO = "feminino", "Feminino"
 
     class Publico(models.TextChoices):
-        HOMEM = "homem", "Homem"
-        MULHER = "mulher", "Mulher"
-        JOVEM = "jovem", "Jovem"
+        HOMEM_JOVEM = "homem_jovem", "Homem jovem - 20 a 29 anos"
+        HOMEM_ADULTO = "homem_adulto", "Homem adulto - 30 a 59 anos"
+        MULHER_JOVEM = "mulher_jovem", "Mulher jovem - 20 a 29 anos"
+        MULHER_ADULTA = "mulher_adulta", "Mulher adulta - 30 a 59 anos"
+        JOVEM = "jovem", "Jovem - 13 anos"
+        IDOSO = "idoso", "Idoso - 60 anos"
 
     nome_completo = models.CharField(max_length=180)
     cpf = models.CharField(max_length=14, unique=True)
     rg = models.CharField(max_length=30, blank=True)
     data_nascimento = models.DateField(null=True, blank=True)
     sexo = models.CharField(max_length=12, choices=Sexo.choices)
-    publico = models.CharField(max_length=12, choices=Publico.choices)
+    publico = models.CharField(max_length=20, choices=Publico.choices)
     telefone = models.CharField(max_length=30, blank=True)
     email = models.EmailField(blank=True)
     endereco = models.CharField(max_length=255, blank=True)

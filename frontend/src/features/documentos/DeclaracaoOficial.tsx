@@ -121,17 +121,15 @@ export default function DeclaracaoOficial({ produtor }: Props) {
           .impressao-declaracao {
             width: 100% !important;
             max-width: 100% !important;
-            padding: 12px 16px !important;
-            font-size: 8pt !important;
-            line-height: 1.3 !important;
+            padding: 18px 22px !important;
+            font-size: 10.5pt !important;
+            line-height: 1.45 !important;
             page-break-inside: avoid !important;
-            transform: scale(0.88);
-            transform-origin: top left;
           }
 
           .impressao-declaracao h1 {
-            font-size: 13pt !important;
-            margin-bottom: 6px !important;
+            font-size: 16pt !important;
+            margin-bottom: 10px !important;
           }
 
           .impressao-declaracao p {

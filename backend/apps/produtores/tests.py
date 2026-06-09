@@ -32,7 +32,7 @@ class ProdutorApiTests(APITestCase):
             "nome_completo": "Maria da Silva",
             "cpf": cpf,
             "sexo": "feminino",
-            "publico": "mulher",
+            "publico": "mulher_adulta",
             "telefone": "92999990000",
             "comunidade": "Comunidade Central",
         }

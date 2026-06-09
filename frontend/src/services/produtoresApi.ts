@@ -28,10 +28,18 @@ function normalizeSexo(value: unknown) {
 
 function normalizePublico(value: unknown) {
   const normalized = normalizeChoice(value);
-  if (normalized === "homem" || normalized === "mulher" || normalized === "jovem") {
+  const allowed = [
+    "homem_jovem",
+    "homem_adulto",
+    "mulher_jovem",
+    "mulher_adulta",
+    "jovem",
+    "idoso",
+  ];
+  if (allowed.includes(normalized)) {
     return normalized;
   }
-  return "homem";
+  return "homem_jovem";
 }
 
 function normalizeTipoLocalizacao(value: unknown) {
@@ -87,14 +95,6 @@ function mapApiProdutorToFrontend(produtor: AnyRecord): ProdutorBase {
     acessoLocalizacao: produtor.localizacao?.acesso || "",
     latitude: produtor.localizacao?.latitude || "",
     longitude: produtor.localizacao?.longitude || "",
-    paa: produtor.paa
-      ? {
-          participa: produtor.paa.participa_paa,
-          perfil: produtor.paa.perfil || "",
-          propriedade: produtor.paa.dados_propriedade || "",
-          observacoes: produtor.paa.observacoes || "",
-        }
-      : undefined,
   };
 }
 
@@ -152,7 +152,6 @@ async function syncProdutorRelations(produtorId: number | string, produtor: AnyR
   await Promise.allSettled([
     syncCulturas(produtorId, produtor),
     syncLocalizacao(produtorId, produtor),
-    syncPaa(produtorId, produtor),
     syncCarteira(produtorId, produtor),
     syncCriacaoAnimal(produtorId, produtor),
     syncMeliponicultura(produtorId, produtor),
@@ -199,21 +198,6 @@ async function syncLocalizacao(produtorId: number | string, produtor: AnyRecord)
       latitude: produtor.latitude || null,
       longitude: produtor.longitude || null,
       observacoes: produtor.observacoes || "",
-    }),
-  });
-}
-
-async function syncPaa(produtorId: number | string, produtor: AnyRecord) {
-  if (!produtor.paa) return;
-
-  await apiRequest(`/produtores/${produtorId}/paa/`, {
-    method: "POST",
-    body: JSON.stringify({
-      participa_paa: Boolean(produtor.paa.participa),
-      perfil: produtor.paa.perfil || "",
-      dados_propriedade: produtor.paa.propriedade || "",
-      documentos_entregues: [],
-      observacoes: produtor.paa.observacoes || "",
     }),
   });
 }

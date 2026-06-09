@@ -58,12 +58,10 @@ export default function SefazNormal({ produtor }: Props) {
           .impressao-sefaz {
             width: 100% !important;
             max-width: 100% !important;
-            font-size: 7px !important;
-            line-height: 1.0 !important;
-            padding: 6px !important;
+            font-size: 9px !important;
+            line-height: 1.15 !important;
+            padding: 10px !important;
             page-break-inside: avoid !important;
-            transform: scale(0.92);
-            transform-origin: top left;
           }
 
           .impressao-sefaz .p-2 {

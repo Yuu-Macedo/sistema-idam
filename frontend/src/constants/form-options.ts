@@ -1,6 +1,13 @@
 export const SEXO_OPTIONS = ["Masculino", "Feminino"] as const;
 
-export const PUBLICO_OPTIONS = ["Homem", "Mulher", "Jovem"] as const;
+export const PUBLICO_OPTIONS = [
+  "Homem jovem - 20 a 29 anos",
+  "Homem adulto - 30 a 59 anos",
+  "Mulher jovem - 20 a 29 anos",
+  "Mulher adulta - 30 a 59 anos",
+  "Jovem - 13 anos",
+  "Idoso - 60 anos",
+] as const;
 
 export const LOCALIZACAO_OPTIONS = [
   "Zona Rural",
@@ -73,8 +80,3 @@ export const ESPECIES_ABELHA = [
 
 export const CARTEIRA_ORGAOS_SUGERIDOS = ["IDAM", "SEPROR"] as const;
 
-export const PAA_PERFIL_OPTIONS = [
-  "Fornecedor individual",
-  "Organização produtiva",
-  "Grupo informal",
-] as const;
