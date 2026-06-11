@@ -2,7 +2,7 @@ import { Leaf, ShieldCheck } from "lucide-react";
 
 export function AppFooter() {
   return (
-    <footer className="border-t border-[#d7e0d7] bg-white text-[#263a31]">
+    <footer className="border-t border-[#d7e0d7] bg-white/88 text-[#263a31] backdrop-blur">
       <div className="grid gap-4 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_auto] lg:px-8">
         <div className="flex min-w-0 items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-[#184b36] text-white">

@@ -64,7 +64,7 @@ export function AppShell({
   onTogglePerfil,
 }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-[#eef3ee] text-[#12251c]">
+    <div className="idam-app-shell">
       <AppHeader
         activeMenuItem={activeMenuItem}
         isAdm={isAdm}
@@ -98,7 +98,7 @@ export function AppShell({
           onToggleCollapsed={onToggleSidebar}
         />
 
-        <main className="app-content min-w-0 flex-1 px-3 py-4 sm:px-5 sm:py-5 lg:px-8 lg:py-7">
+        <main className="app-content idam-main flex-1">
           <WorkspaceBanner activeMenuItem={activeMenuItem} />
 
           <AppRoutes

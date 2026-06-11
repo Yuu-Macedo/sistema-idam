@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Lock, Mail, Shield, User, X } from "lucide-react";
+import { saveUsuarioApi } from "../../services/usuariosApi";
 
 interface CadastroUsuarioProps {
   onClose: () => void;
@@ -8,7 +9,7 @@ interface CadastroUsuarioProps {
     id: string;
     nome: string;
     email: string;
-    tipo: "adm" | "tecnico";
+    tipo: "adm" | "tecnico" | "visualizador";
     numeroConselho?: string;
   } | null;
   permitirEscolherTipo?: boolean;
@@ -19,7 +20,7 @@ interface UsuarioSalvo {
   nome: string;
   email: string;
   senha?: string;
-  tipo?: "adm" | "tecnico";
+  tipo?: "adm" | "tecnico" | "visualizador";
   numeroConselho?: string;
   dataCadastro?: string;
 }
@@ -34,7 +35,7 @@ export default function CadastroUsuario({
   const [email, setEmail] = useState(usuarioEdicao?.email || "");
   const [senha, setSenha] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
-  const [tipo, setTipo] = useState<"adm" | "tecnico">(
+  const [tipo, setTipo] = useState<"adm" | "tecnico" | "visualizador">(
     usuarioEdicao?.tipo || "tecnico",
   );
   const [numeroConselho, setNumeroConselho] = useState(
@@ -44,7 +45,7 @@ export default function CadastroUsuario({
   const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [erro, setErro] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro("");
 
@@ -84,6 +85,19 @@ export default function CadastroUsuario({
     if (emailExiste) {
       setErro("Este email já está cadastrado");
       return;
+    }
+
+    try {
+      await saveUsuarioApi({
+        id: usuarioEdicao?.id,
+        nome,
+        email,
+        senha,
+        tipo,
+        numeroConselho: tipo === "tecnico" ? numeroConselho : "",
+      });
+    } catch (error) {
+      console.warn("API indisponível, mantendo usuário localmente.", error);
     }
 
     if (usuarioEdicao) {
@@ -232,12 +246,13 @@ export default function CadastroUsuario({
                       id="tipo-usuario"
                       value={tipo}
                       onChange={(e) =>
-                        setTipo(e.target.value as "adm" | "tecnico")
+                        setTipo(e.target.value as "adm" | "tecnico" | "visualizador")
                       }
                       className="pl-11"
                     >
                       <option value="tecnico">Técnico</option>
                       <option value="adm">Administrador</option>
+                      <option value="visualizador">Visualizador</option>
                     </select>
                   </div>
                 </div>

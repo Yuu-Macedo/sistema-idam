@@ -17,11 +17,11 @@ import {
 import type { Tab, UsuarioLogado } from "../types/app";
 import {
   clearUsuarioLogado,
-  ensureDefaultAdmin,
-  findUsuarioByCredentials,
   getUsuarioLogado,
-  saveUsuarioLogado,
 } from "../services/authStorage";
+import { loginWithApi, logoutWithApi } from "../services/authApi";
+import { fetchProdutoresApi } from "../services/produtoresApi";
+import { syncApiResourcesToLocalStorage } from "../services/resourcesApi";
 
 const Login = lazy(() => import("../pages/Auth/LoginPage"));
 
@@ -50,8 +50,20 @@ export default function App() {
   }, [location.pathname, rotasPermitidas]);
 
   useEffect(() => {
-    ensureDefaultAdmin();
-  }, []);
+    if (!usuarioLogado) return;
+
+    fetchProdutoresApi()
+      .then((produtores) => {
+        localStorage.setItem("produtores", JSON.stringify(produtores));
+      })
+      .catch((error) => {
+        console.warn("Não foi possível sincronizar produtores com a API.", error);
+      });
+
+    syncApiResourcesToLocalStorage().catch((error) => {
+      console.warn("Não foi possível sincronizar recursos extras com a API.", error);
+    });
+  }, [usuarioLogado]);
 
   useEffect(() => {
     const handleClickFora = (event: MouseEvent) => {
@@ -68,28 +80,31 @@ export default function App() {
     setUsuarioLogado(getUsuarioLogado());
   };
 
-  const handleLogin = (
+  const handleLogin = async (
     email: string,
     senha: string,
-    usuarioRecebido?: UsuarioLogado,
   ) => {
-    if (usuarioRecebido) {
-      saveUsuarioLogado(usuarioRecebido);
-      setUsuarioLogado(usuarioRecebido);
-      navigate(getHomePath(usuarioRecebido), { replace: true });
+    try {
+      const usuarioApi = await loginWithApi(email, senha);
+      setUsuarioLogado(usuarioApi);
+      navigate(getHomePath(usuarioApi), { replace: true });
       return;
+    } catch (error) {
+      console.warn("Login via API indisponível, tentando login local.", error);
     }
 
-    const usuario = findUsuarioByCredentials(email, senha);
-
-    if (usuario) {
-      saveUsuarioLogado(usuario);
-      setUsuarioLogado(usuario);
-      navigate(getHomePath(usuario), { replace: true });
-    }
+    throw new Error(
+      "Nao foi possivel entrar. Verifique se a API esta online e se o email/senha estao corretos.",
+    );
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutWithApi();
+    } catch (error) {
+      console.warn("Logout via API não concluído.", error);
+    }
+
     clearUsuarioLogado();
     setUsuarioLogado(null);
     setMenuPerfilAberto(false);

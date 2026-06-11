@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import AtendimentoDocumento from "./AtendimentoDocumento";
+import { saveAtendimentoApi } from "../../services/resourcesApi";
 
 interface Produtor {
   id: string;
@@ -3317,7 +3318,7 @@ export default function Atendimento() {
                 )}
 
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (!selectedProdutor) return;
 
                     const atendimentos = JSON.parse(
@@ -3349,8 +3350,18 @@ export default function Atendimento() {
                       atividadesAdicionais: atividadesAdicionais,
                     };
 
-                    const novaLista = [
+                    const atendimentoSalvo = await saveAtendimentoApi(
                       novoAtendimento,
+                    ).catch((error) => {
+                      console.warn(
+                        "API indisponivel, atendimento salvo localmente.",
+                        error,
+                      );
+                      return novoAtendimento;
+                    });
+
+                    const novaLista = [
+                      atendimentoSalvo,
                       ...atendimentos,
                     ];
 
@@ -3359,7 +3370,7 @@ export default function Atendimento() {
                       JSON.stringify(novaLista),
                     );
 
-                    setUltimoAtendimentoSalvo(novoAtendimento);
+                    setUltimoAtendimentoSalvo(atendimentoSalvo);
 
                     alert("Atendimento salvo com sucesso!");
                   }}

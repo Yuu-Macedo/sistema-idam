@@ -1,0 +1,254 @@
+@layer base {
+  :root {
+    --idam-green-950: #092016;
+    --idam-green-900: #123525;
+    --idam-green-800: #174832;
+    --idam-green-700: #1f6547;
+    --idam-green-600: #2f805c;
+    --idam-green-100: #dff2e6;
+    --idam-green-50: #f3faf5;
+    --idam-sky-600: #2563a8;
+    --idam-amber-600: #b7791f;
+    --idam-red-600: #c73434;
+    --idam-text: #12231b;
+    --idam-text-soft: #5e7067;
+    --idam-border: #d8e3dc;
+    --idam-radius-sm: 8px;
+    --idam-radius-md: 12px;
+    --idam-radius-lg: 16px;
+    --idam-shadow-sm: 0 1px 2px rgb(18 35 27 / 0.05);
+    --idam-shadow-md: 0 12px 28px rgb(18 35 27 / 0.08);
+    --idam-shadow-lg: 0 24px 60px rgb(18 35 27 / 0.12);
+    --idam-transition: 160ms ease;
+  }
+
+  body {
+    background:
+      radial-gradient(circle at top left, rgb(31 101 71 / 0.08), transparent 26rem),
+      linear-gradient(180deg, #f7faf7 0%, #eef4ef 100%);
+    color: var(--idam-text);
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  ::selection {
+    background: rgb(31 101 71 / 0.22);
+    color: var(--idam-green-950);
+  }
+}
+
+@layer components {
+  .idam-app-shell {
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at 16rem 0, rgb(47 128 92 / 0.12), transparent 26rem),
+      linear-gradient(180deg, #f8fbf8 0%, #eef4ef 100%);
+    color: var(--idam-text);
+  }
+
+  .idam-main {
+    width: 100%;
+    min-width: 0;
+    padding: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .idam-main {
+      padding: 1.25rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .idam-main {
+      padding: 1.5rem 2rem 2rem;
+    }
+  }
+
+  .idam-page-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .idam-card,
+  .idam-surface,
+  .idam-form > section,
+  .idam-form > div,
+  .idam-form form > section,
+  .idam-form form > div[class*="bg-card"],
+  .idam-form form > div[class*="rounded"],
+  div[class*="bg-card"][class*="border"],
+  section[class*="bg-card"][class*="border"] {
+    border: 1px solid var(--idam-border) !important;
+    border-radius: var(--idam-radius-md) !important;
+    background: rgb(255 255 255 / 0.96) !important;
+    box-shadow: var(--idam-shadow-sm) !important;
+  }
+
+  .idam-card:hover,
+  .idam-surface:hover {
+    box-shadow: var(--idam-shadow-md) !important;
+  }
+
+  .idam-page-hero {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgb(255 255 255 / 0.72);
+    border-radius: var(--idam-radius-lg);
+    background:
+      linear-gradient(135deg, rgb(18 53 37 / 0.96), rgb(31 101 71 / 0.94)),
+      linear-gradient(90deg, rgb(255 255 255 / 0.08) 1px, transparent 1px);
+    box-shadow: var(--idam-shadow-lg);
+    color: #fff;
+  }
+
+  .idam-page-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -5rem -6rem auto;
+    width: 20rem;
+    height: 20rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.06);
+    pointer-events: none;
+  }
+
+  .idam-module-pill {
+    display: inline-flex;
+    min-height: 2.25rem;
+    align-items: center;
+    gap: 0.45rem;
+    border-radius: 999px;
+    border: 1px solid rgb(216 227 220 / 0.9);
+    background: rgb(255 255 255 / 0.86);
+    padding: 0.45rem 0.75rem;
+    color: var(--idam-green-800);
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    box-shadow: var(--idam-shadow-sm);
+  }
+
+  .idam-kpi {
+    border: 1px solid var(--idam-border);
+    border-radius: var(--idam-radius-md);
+    background: linear-gradient(180deg, #fff 0%, #fbfdfb 100%);
+    box-shadow: var(--idam-shadow-sm);
+    transition:
+      transform var(--idam-transition),
+      box-shadow var(--idam-transition),
+      border-color var(--idam-transition);
+  }
+
+  .idam-kpi:hover {
+    transform: translateY(-2px);
+    border-color: rgb(31 101 71 / 0.35);
+    box-shadow: var(--idam-shadow-md);
+  }
+
+  .idam-field,
+  .idam-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .idam-form select,
+  .idam-form textarea,
+  input[class*="bg-input"],
+  select[class*="bg-input"],
+  textarea[class*="bg-input"],
+  .form-input {
+    min-height: 2.75rem;
+    border: 1px solid var(--idam-border) !important;
+    border-radius: var(--idam-radius-sm) !important;
+    background: #fbfdfb !important;
+    color: var(--idam-text) !important;
+    box-shadow: inset 0 1px 0 rgb(18 35 27 / 0.03);
+    transition:
+      border-color var(--idam-transition),
+      box-shadow var(--idam-transition),
+      background-color var(--idam-transition);
+  }
+
+  .idam-field:focus,
+  .idam-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+  .idam-form select:focus,
+  .idam-form textarea:focus,
+  input[class*="bg-input"]:focus,
+  select[class*="bg-input"]:focus,
+  textarea[class*="bg-input"]:focus,
+  .form-input:focus {
+    border-color: var(--idam-green-700) !important;
+    background: #fff !important;
+    outline: none !important;
+    box-shadow: 0 0 0 4px rgb(31 101 71 / 0.14) !important;
+  }
+
+  .idam-form label {
+    color: #263b31 !important;
+    font-size: 0.875rem !important;
+    font-weight: 750 !important;
+  }
+
+  .idam-form h2,
+  .idam-form h3 {
+    color: var(--idam-text) !important;
+    letter-spacing: 0;
+  }
+
+  .idam-primary-button,
+  button[class*="bg-primary"],
+  button[class*="bg-[#184b36]"] {
+    border-radius: var(--idam-radius-sm) !important;
+    background: var(--idam-green-800) !important;
+    box-shadow: 0 10px 22px rgb(23 72 50 / 0.16) !important;
+    transition:
+      background-color var(--idam-transition),
+      box-shadow var(--idam-transition),
+      transform var(--idam-transition) !important;
+  }
+
+  .idam-primary-button:hover,
+  button[class*="bg-primary"]:hover,
+  button[class*="bg-[#184b36]"]:hover {
+    background: var(--idam-green-900) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgb(23 72 50 / 0.2) !important;
+  }
+
+  .idam-table,
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .idam-table thead,
+  table thead {
+    background: #f3faf5;
+    color: var(--idam-text-soft);
+  }
+
+  .idam-table th,
+  table th {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .idam-empty-state {
+    border: 1px dashed rgb(31 101 71 / 0.26);
+    border-radius: var(--idam-radius-md);
+    background:
+      linear-gradient(180deg, rgb(243 250 245 / 0.96), rgb(255 255 255 / 0.96));
+    padding: 2rem;
+    text-align: center;
+    color: var(--idam-text-soft);
+  }
+
+  .idam-focus-ring {
+    outline: none;
+  }
+
+  .idam-focus-ring:focus-visible {
+    outline: 3px solid rgb(31 101 71 / 0.22);
+    outline-offset: 2px;
+  }
+}

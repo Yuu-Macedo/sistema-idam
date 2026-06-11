@@ -6,6 +6,7 @@ import {
   Leaf,
   LogOut,
   Menu,
+  Search,
   Settings,
   Shield,
   UserPlus,
@@ -52,13 +53,13 @@ export function AppHeader({
   const cargo = isAdm ? "Administrador" : "Técnico de campo";
 
   return (
-    <header className="sticky top-0 z-30 border-b border-[#dce5dc] bg-white/95 shadow-sm backdrop-blur">
-      <div className="flex min-h-16 items-center justify-between gap-3 px-3 sm:px-5 lg:px-7">
+    <header className="sticky top-0 z-30 border-b border-[#dce5dc] bg-white/90 shadow-sm backdrop-blur-xl">
+      <div className="flex min-h-[4.5rem] items-center justify-between gap-3 px-3 sm:px-5 lg:px-7">
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={onOpenMobileMenu}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-[#d7e0d7] bg-white text-[#184b36] transition hover:bg-[#edf6ed] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b6b49] lg:hidden"
+            className="idam-focus-ring inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#d7e0d7] bg-white text-[#184b36] transition hover:bg-[#edf6ed] lg:hidden"
             aria-label="Abrir menu de navegação"
           >
             <Menu className="h-5 w-5" />
@@ -67,7 +68,7 @@ export function AppHeader({
           <button
             type="button"
             onClick={onToggleSidebar}
-            className="hidden h-10 w-10 items-center justify-center rounded-md border border-[#d7e0d7] bg-white text-[#184b36] transition hover:bg-[#edf6ed] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b6b49] lg:inline-flex"
+            className="idam-focus-ring hidden h-10 w-10 items-center justify-center rounded-lg border border-[#d7e0d7] bg-white text-[#184b36] transition hover:bg-[#edf6ed] lg:inline-flex"
             aria-label="Recolher ou expandir menu lateral"
           >
             <ChevronsLeftRight className="h-5 w-5" />
@@ -76,7 +77,7 @@ export function AppHeader({
           <div className="hidden h-10 w-px bg-[#dce5dc] sm:block" />
 
           <div className="flex min-w-0 items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[#184b36] text-white shadow-sm">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#174832] text-white shadow-sm ring-4 ring-[#dff2e6]">
               <ActiveIcon className="h-5 w-5" />
             </div>
             <div className="min-w-0">
@@ -92,24 +93,36 @@ export function AppHeader({
           </div>
         </div>
 
+        <div className="hidden min-w-[18rem] max-w-md flex-1 items-center xl:flex">
+          <label className="relative w-full" aria-label="Pesquisa global">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#607368]" />
+            <input
+              type="search"
+              placeholder="Pesquisar produtor, CPF, comunidade..."
+              className="idam-field h-11 w-full pl-10 pr-4 text-sm"
+            />
+          </label>
+        </div>
+
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <button
             type="button"
-            className="hidden h-10 w-10 items-center justify-center rounded-md border border-[#d7e0d7] bg-white text-[#547465] transition hover:bg-[#edf6ed] hover:text-[#184b36] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b6b49] sm:inline-flex"
+            className="idam-focus-ring relative hidden h-10 w-10 items-center justify-center rounded-lg border border-[#d7e0d7] bg-white text-[#547465] transition hover:bg-[#edf6ed] hover:text-[#184b36] sm:inline-flex"
             aria-label="Notificações"
           >
             <Bell className="h-5 w-5" />
+            <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-[#b7791f]" />
           </button>
 
           <div className="relative" ref={menuRef}>
             <button
               type="button"
               onClick={onTogglePerfil}
-              className="flex items-center gap-2 rounded-lg border border-[#d7e0d7] bg-white px-2 py-1.5 text-left shadow-sm transition hover:bg-[#f6faf6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1b6b49] sm:px-3"
+              className="idam-focus-ring flex items-center gap-2 rounded-xl border border-[#d7e0d7] bg-white px-2 py-1.5 text-left shadow-sm transition hover:bg-[#f6faf6] sm:px-3"
               aria-expanded={menuPerfilAberto}
               aria-haspopup="menu"
             >
-              <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#dff0e4] text-sm font-bold text-[#184b36]">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#dff0e4] text-sm font-bold text-[#184b36]">
                 {getInitials(usuarioLogado.nome) || "ID"}
               </span>
               <span className="hidden min-w-0 sm:block">

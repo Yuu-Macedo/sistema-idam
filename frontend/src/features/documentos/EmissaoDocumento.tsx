@@ -11,6 +11,7 @@ import DeclaracaoOficial from "./DeclaracaoOficial";
 import DeclaracaoPescadorOficial from "./DeclaracaoPescadorOficial";
 import SefazNormal from "./SefazNormal";
 import SefazPescador from "./SefazPescador";
+import { saveDocumentoEmitidoApi } from "../../services/resourcesApi";
 
 interface Produtor {
   id: string;
@@ -133,8 +134,46 @@ export default function EmissaoDocumento() {
     documentTitle: `${documentTypeFinal}_${selectedProdutor?.nome || "documento"}`,
   });
 
-  const handleDownloadPDF = () => {
-    // usa a mesma impressão do documento isolado
+  const registrarDocumentoEmitido = async () => {
+    if (!selectedProdutor) return;
+
+    const usuarioLogado = JSON.parse(
+      localStorage.getItem("usuarioLogado") || "null",
+    );
+    const historico = JSON.parse(
+      localStorage.getItem("historicoDocumentos") || "[]",
+    );
+    const novoDocumento = {
+      id: Date.now().toString(),
+      produtorId: selectedProdutor.id,
+      produtorNome: selectedProdutor.nome,
+      produtorCpf: selectedProdutor.cpf,
+      tipoDocumento: documentTypeFinal,
+      geradoPorId: usuarioLogado?.id || "",
+      geradoPorNome: usuarioLogado?.nome || "",
+      dataGeracao: new Date().toISOString(),
+    };
+
+    const documentoSalvo = await saveDocumentoEmitidoApi(novoDocumento).catch(
+      (error) => {
+        console.warn("API indisponivel, documento salvo localmente.", error);
+        return novoDocumento;
+      },
+    );
+
+    localStorage.setItem(
+      "historicoDocumentos",
+      JSON.stringify([documentoSalvo, ...historico]),
+    );
+  };
+
+  const handlePrintDocumento = async () => {
+    await registrarDocumentoEmitido();
+    handlePrint();
+  };
+
+  const handleDownloadPDFComRegistro = async () => {
+    await registrarDocumentoEmitido();
     handlePrint();
   };
 
@@ -283,7 +322,7 @@ export default function EmissaoDocumento() {
         <div className="bg-card p-6 rounded-xl border">
           <div className="flex flex-wrap gap-4">
             <button
-              onClick={handlePrint}
+              onClick={handlePrintDocumento}
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-accent/50 transition-all"
             >
               <Printer className="w-4 h-4" />
@@ -291,7 +330,7 @@ export default function EmissaoDocumento() {
             </button>
 
             <button
-              onClick={handleDownloadPDF}
+              onClick={handleDownloadPDFComRegistro}
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:bg-accent/50 transition-all"
             >
               <Download className="w-4 h-4" />

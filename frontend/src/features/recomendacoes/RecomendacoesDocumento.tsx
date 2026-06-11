@@ -41,12 +41,10 @@ export default function RecomendacoesDocumento({
           .impressao-recomendacoes {
             width: 100% !important;
             max-width: 100% !important;
-            padding: 12px !important;
-            font-size: 9pt !important;
-            line-height: 1.4 !important;
+            padding: 18px !important;
+            font-size: 11pt !important;
+            line-height: 1.5 !important;
             page-break-inside: avoid !important;
-            transform: scale(0.95);
-            transform-origin: top left;
           }
 
           .impressao-recomendacoes .linha-recomendacao {

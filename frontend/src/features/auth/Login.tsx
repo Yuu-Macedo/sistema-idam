@@ -10,6 +10,7 @@ import {
   Shield,
   User,
 } from "lucide-react";
+import type { TipoUsuario } from "../../types/app";
 
 interface LoginProps {
   onLogin: (
@@ -19,17 +20,9 @@ interface LoginProps {
       id: string;
       nome: string;
       email: string;
-      tipo: "adm" | "tecnico";
+      tipo: TipoUsuario;
     },
-  ) => void;
-}
-
-interface UsuarioLocalStorage {
-  id: string;
-  nome: string;
-  email: string;
-  senha: string;
-  tipo?: "adm" | "tecnico";
+  ) => Promise<void> | void;
 }
 
 const workflowItems = [
@@ -55,8 +48,9 @@ export default function Login({ onLogin }: LoginProps) {
   const [senha, setSenha] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErro("");
 
@@ -65,30 +59,15 @@ export default function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    const rawUsuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-    const usuarios: UsuarioLocalStorage[] = Array.isArray(rawUsuarios)
-      ? rawUsuarios
-      : [];
+    setCarregando(true);
 
-    const usuario = usuarios.find(
-      (item) => item.email === email && item.senha === senha,
-    );
-
-    if (!usuario) {
-      setErro("Email ou senha incorretos.");
-      return;
+    try {
+      await onLogin(email, senha);
+    } catch (error) {
+      setErro(error instanceof Error ? error.message : "Não foi possível entrar.");
+    } finally {
+      setCarregando(false);
     }
-
-    const usuarioLogado = {
-      id: usuario.id,
-      email: usuario.email,
-      nome: usuario.nome,
-      tipo: (usuario.tipo || "tecnico") as "adm" | "tecnico",
-      loginTime: new Date().toISOString(),
-    };
-
-    localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
-    onLogin(usuario.email, senha, usuarioLogado);
   };
 
   return (
@@ -184,6 +163,7 @@ export default function Login({ onLogin }: LoginProps) {
                     placeholder="seu@email.com"
                     className="w-full rounded-lg border border-[#d7e0d7] bg-[#fbfdfb] py-3.5 pl-12 pr-4 text-[#12251c] transition placeholder:text-[#8a968f] focus:border-[#1b6b49] focus:outline-none focus:ring-4 focus:ring-[#1b6b49]/12"
                     required
+                    disabled={carregando}
                   />
                 </div>
               </div>
@@ -203,6 +183,7 @@ export default function Login({ onLogin }: LoginProps) {
                     placeholder="Digite sua senha"
                     className="w-full rounded-lg border border-[#d7e0d7] bg-[#fbfdfb] py-3.5 pl-12 pr-14 text-[#12251c] transition placeholder:text-[#8a968f] focus:border-[#1b6b49] focus:outline-none focus:ring-4 focus:ring-[#1b6b49]/12"
                     required
+                    disabled={carregando}
                   />
                   <button
                     type="button"
@@ -221,9 +202,10 @@ export default function Login({ onLogin }: LoginProps) {
 
               <button
                 type="submit"
-                className="w-full rounded-lg bg-[#184b36] py-3.5 font-bold text-white shadow-lg shadow-[#184b36]/20 transition hover:bg-[#123d2d] focus:outline-none focus:ring-4 focus:ring-[#1b6b49]/20"
+                disabled={carregando}
+                className="w-full rounded-lg bg-[#184b36] py-3.5 font-bold text-white shadow-lg shadow-[#184b36]/20 transition hover:bg-[#123d2d] focus:outline-none focus:ring-4 focus:ring-[#1b6b49]/20 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                Entrar
+                {carregando ? "Entrando..." : "Entrar"}
               </button>
             </form>
 

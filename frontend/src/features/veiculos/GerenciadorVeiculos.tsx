@@ -9,6 +9,7 @@ import {
   Trash2,
   Sparkles,
 } from "lucide-react";
+import { deleteVeiculoApi, saveVeiculoApi } from "../../services/resourcesApi";
 
 export type Veiculo = {
   id: string;
@@ -164,7 +165,7 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
     setMensagem("");
   };
 
-  const confirmarUsoVeiculo = (veiculoId: string) => {
+  const confirmarUsoVeiculo = async (veiculoId: string) => {
     if (!usuarioLogado) {
       setMensagem("Usuário não identificado.");
       return;
@@ -187,30 +188,42 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
 
     const retirada = new Date().toISOString();
 
-    setVeiculos((atual) =>
-      atual.map((veiculo) => {
-        if (veiculo.id !== veiculoId || veiculo.status !== "Disponível") {
-          return veiculo;
-        }
+    const veiculoAtual = veiculos.find(
+      (veiculo) => veiculo.id === veiculoId && veiculo.status === "Disponível",
+    );
 
-        return {
-          ...veiculo,
-          status: "Em uso",
-          tecnicoEmUsoId: usuarioLogado.id,
-          tecnicoEmUsoNome: usuarioLogado.nome,
+    if (!veiculoAtual) {
+      setMensagem("Veículo indisponível para uso.");
+      return;
+    }
+
+    const veiculoEmUso = {
+      ...veiculoAtual,
+      status: "Em uso" as Veiculo["status"],
+      tecnicoEmUsoId: usuarioLogado.id,
+      tecnicoEmUsoNome: usuarioLogado.nome,
+      finalidadeUso: finalidadeUso.trim(),
+      dataRetirada: retirada,
+      historicoUso: [
+        ...(veiculoAtual.historicoUso ?? []),
+        {
+          tecnicoId: usuarioLogado.id,
+          tecnicoNome: usuarioLogado.nome,
           finalidadeUso: finalidadeUso.trim(),
           dataRetirada: retirada,
-          historicoUso: [
-            ...(veiculo.historicoUso ?? []),
-            {
-              tecnicoId: usuarioLogado.id,
-              tecnicoNome: usuarioLogado.nome,
-              finalidadeUso: finalidadeUso.trim(),
-              dataRetirada: retirada,
-            },
-          ],
-        };
-      }),
+        },
+      ],
+    };
+
+    const veiculoSalvo = await saveVeiculoApi(veiculoEmUso).catch((error) => {
+      console.warn("API indisponivel, uso do veiculo salvo localmente.", error);
+      return veiculoEmUso;
+    });
+
+    setVeiculos((atual) =>
+      atual.map((veiculo) =>
+        veiculo.id === veiculoId ? { ...veiculo, ...veiculoSalvo } : veiculo,
+      ),
     );
 
     setMensagem("Veículo registrado para uso.");
@@ -218,41 +231,54 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
     setFinalidadeUso("");
   };
 
-  const devolverVeiculo = (veiculoId: string) => {
+  const devolverVeiculo = async (veiculoId: string) => {
     if (!usuarioLogado) {
       setMensagem("Usuário não identificado.");
       return;
     }
 
+    const veiculoAtual = veiculos.find(
+      (veiculo) =>
+        veiculo.id === veiculoId && veiculo.tecnicoEmUsoId === usuarioLogado.id,
+    );
+
+    if (!veiculoAtual) {
+      setMensagem("Veículo não encontrado para devolução.");
+      return;
+    }
+
+    const devolucao = new Date().toISOString();
+    const veiculoDisponivel = {
+      ...veiculoAtual,
+      status: "Disponível" as Veiculo["status"],
+      tecnicoEmUsoId: undefined,
+      tecnicoEmUsoNome: undefined,
+      finalidadeUso: undefined,
+      dataRetirada: undefined,
+      historicoUso: veiculoAtual.historicoUso
+        ? veiculoAtual.historicoUso.map((registro, index, array) =>
+            index === array.length - 1
+              ? { ...registro, dataDevolucao: devolucao }
+              : registro,
+          )
+        : [],
+    };
+
+    const veiculoSalvo = await saveVeiculoApi(veiculoDisponivel).catch((error) => {
+      console.warn("API indisponivel, devolucao de veiculo salva localmente.", error);
+      return veiculoDisponivel;
+    });
+
     setVeiculos((atual) =>
-      atual.map((veiculo) => {
-        if (veiculo.id !== veiculoId) return veiculo;
-        if (veiculo.tecnicoEmUsoId !== usuarioLogado.id) return veiculo;
-
-        const devolucao = new Date().toISOString();
-
-        return {
-          ...veiculo,
-          status: "Disponível",
-          tecnicoEmUsoId: undefined,
-          tecnicoEmUsoNome: undefined,
-          finalidadeUso: undefined,
-          dataRetirada: undefined,
-          historicoUso: veiculo.historicoUso
-            ? veiculo.historicoUso.map((registro, index, array) =>
-                index === array.length - 1
-                  ? { ...registro, dataDevolucao: devolucao }
-                  : registro,
-              )
-            : [],
-        };
-      }),
+      atual.map((veiculo) =>
+        veiculo.id === veiculoId ? { ...veiculo, ...veiculoSalvo } : veiculo,
+      ),
     );
 
     setMensagem("Veículo devolvido e liberado com sucesso.");
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (isTecnicoUser) {
@@ -271,12 +297,17 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
       gasolina: Number(form.gasolina),
     };
 
+    const veiculoSalvo = await saveVeiculoApi(novoVeiculo).catch((error) => {
+      console.warn("API indisponível, veículo salvo localmente.", error);
+      return novoVeiculo;
+    });
+
     setVeiculos((atual) => {
       if (editId) {
-        return atual.map((item) => (item.id === editId ? novoVeiculo : item));
+        return atual.map((item) => (item.id === editId ? veiculoSalvo : item));
       }
 
-      return [novoVeiculo, ...atual];
+      return [veiculoSalvo, ...atual];
     });
 
     setMensagem(editId ? "Veículo atualizado com sucesso." : "Veículo cadastrado com sucesso.");
@@ -294,7 +325,7 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
     setMensagem("");
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (isTecnicoUser) {
       setMensagem("Técnicos não podem excluir veículos.");
       return;
@@ -304,6 +335,9 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
       return;
     }
 
+    await deleteVeiculoApi(id).catch((error) => {
+      console.warn("API indisponível, veículo excluído localmente.", error);
+    });
     setVeiculos((atual) => atual.filter((item) => item.id !== id));
     setMensagem("Veículo excluído.");
     if (editId === id) {
@@ -319,7 +353,7 @@ export default function GerenciadorVeiculos({ usuarioLogado }: GerenciadorVeicul
   };
 
   return (
-    <div className="space-y-8">
+    <div className="idam-form space-y-8">
       <div className="grid gap-4 xl:grid-cols-4">
         <div className="rounded-3xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm">
           <div className="flex items-center gap-3 text-emerald-700">

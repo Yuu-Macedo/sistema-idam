@@ -11,14 +11,8 @@ type UsuarioSalvo = {
 
 const USUARIOS_STORAGE_KEY = "usuarios";
 const USUARIO_LOGADO_STORAGE_KEY = "usuarioLogado";
-
-const ADMIN_PADRAO: UsuarioSalvo = {
-  id: "1",
-  nome: "adm1",
-  email: "brunoguilherme@gmail.com",
-  senha: "adm123",
-  tipo: "adm",
-};
+const ACCESS_TOKEN_STORAGE_KEY = "idamAccessToken";
+const REFRESH_TOKEN_STORAGE_KEY = "idamRefreshToken";
 
 function normalizeUsuarioLogado(usuario: UsuarioSalvo): UsuarioLogado {
   return {
@@ -29,38 +23,47 @@ function normalizeUsuarioLogado(usuario: UsuarioSalvo): UsuarioLogado {
   };
 }
 
-export function getUsuariosSalvos(): UsuarioSalvo[] {
-  return JSON.parse(localStorage.getItem(USUARIOS_STORAGE_KEY) || "[]") as UsuarioSalvo[];
+export function normalizeTipoUsuario(tipo?: string): TipoUsuario {
+  if (tipo === "administrador" || tipo === "adm") return "adm";
+  if (tipo === "visualizador") return "visualizador";
+  return "tecnico";
 }
 
-export function ensureDefaultAdmin() {
-  const usuariosSalvos = getUsuariosSalvos();
-  const existeAdm = usuariosSalvos.some((u) => u.email === ADMIN_PADRAO.email);
+export function normalizeApiUsuario(usuario: {
+  id?: number | string;
+  nome?: string;
+  email?: string;
+  tipo_usuario?: string;
+  tipo?: string;
+}): UsuarioLogado {
+  return {
+    id: String(usuario.id || ""),
+    nome: String(usuario.nome || ""),
+    email: String(usuario.email || ""),
+    tipo: normalizeTipoUsuario(usuario.tipo_usuario || usuario.tipo),
+  };
+}
 
-  if (existeAdm) return;
-
-  localStorage.setItem(
-    USUARIOS_STORAGE_KEY,
-    JSON.stringify([
-      { ...ADMIN_PADRAO, dataCadastro: new Date().toISOString() },
-      ...usuariosSalvos,
-    ]),
-  );
+export function getUsuariosSalvos(): UsuarioSalvo[] {
+  try {
+    const usuarios = JSON.parse(localStorage.getItem(USUARIOS_STORAGE_KEY) || "[]");
+    return Array.isArray(usuarios) ? (usuarios as UsuarioSalvo[]) : [];
+  } catch {
+    localStorage.removeItem(USUARIOS_STORAGE_KEY);
+    return [];
+  }
 }
 
 export function getUsuarioLogado(): UsuarioLogado | null {
   const usuario = localStorage.getItem(USUARIO_LOGADO_STORAGE_KEY);
   if (!usuario) return null;
 
-  return normalizeUsuarioLogado(JSON.parse(usuario) as UsuarioSalvo);
-}
-
-export function findUsuarioByCredentials(email: string, senha: string) {
-  const usuario = getUsuariosSalvos().find(
-    (item) => item.email === email && item.senha === senha,
-  );
-
-  return usuario ? normalizeUsuarioLogado(usuario) : null;
+  try {
+    return normalizeUsuarioLogado(JSON.parse(usuario) as UsuarioSalvo);
+  } catch {
+    clearUsuarioLogado();
+    return null;
+  }
 }
 
 export function saveUsuarioLogado(usuario: UsuarioLogado) {
@@ -73,6 +76,21 @@ export function saveUsuarioLogado(usuario: UsuarioLogado) {
   );
 }
 
+export function saveAuthTokens(access: string, refresh: string) {
+  localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, access);
+  localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, refresh);
+}
+
+export function getAccessToken() {
+  return localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
+}
+
+export function getRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_STORAGE_KEY);
+}
+
 export function clearUsuarioLogado() {
   localStorage.removeItem(USUARIO_LOGADO_STORAGE_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY);
 }

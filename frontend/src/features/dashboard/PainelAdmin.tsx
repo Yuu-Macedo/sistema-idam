@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BadgeCheck,
   BarChart3,
@@ -10,6 +10,12 @@ import {
   Users,
   WalletCards,
 } from "lucide-react";
+import { MetricCard } from "../../components/shared/MetricCard";
+import { fetchProdutoresApi } from "../../services/produtoresApi";
+import {
+  fetchDashboardReport,
+  type DashboardReport,
+} from "../../services/relatoriosApi";
 
 type CulturaAgricola = {
   tipoCultura?: string;
@@ -66,42 +72,6 @@ function toChartItems(counts: Record<string, number>, limit = 5): ChartItem[] {
     .slice(0, limit);
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-  icon,
-  tone = "green",
-}: {
-  title: string;
-  value: number | string;
-  description: string;
-  icon: ReactNode;
-  tone?: "green" | "blue" | "amber" | "red";
-}) {
-  const tones = {
-    green: "bg-[#dff0e4] text-[#184b36]",
-    blue: "bg-[#e3f2fd] text-[#155e91]",
-    amber: "bg-[#fff4cf] text-[#8a5a00]",
-    red: "bg-[#fde7e7] text-[#b42318]",
-  };
-
-  return (
-    <article className="rounded-xl border border-[#d7e0d7] bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold text-[#607368]">{title}</p>
-          <p className="mt-2 text-3xl font-bold tracking-tight text-[#12251c]">
-            {value}
-          </p>
-        </div>
-        <div className={`rounded-lg p-2.5 ${tones[tone]}`}>{icon}</div>
-      </div>
-      <p className="mt-3 text-sm leading-5 text-[#607368]">{description}</p>
-    </article>
-  );
-}
-
 function BarList({
   title,
   items,
@@ -150,10 +120,36 @@ function BarList({
 
 export default function PainelAdmin() {
   const [busca, setBusca] = useState("");
-  const [produtores] = useState<Produtor[]>(() => getStoredList("produtores"));
+  const [produtores, setProdutores] = useState<Produtor[]>(() =>
+    getStoredList("produtores"),
+  );
   const [documentos] = useState<unknown[]>(() =>
     getStoredList("historicoDocumentos"),
   );
+  const [dashboardReport, setDashboardReport] =
+    useState<DashboardReport | null>(null);
+  const [origemDados, setOrigemDados] = useState<"api" | "local">("local");
+
+  useEffect(() => {
+    let ativo = true;
+
+    Promise.all([fetchDashboardReport(), fetchProdutoresApi()])
+      .then(([report, produtoresApi]) => {
+        if (!ativo) return;
+        setDashboardReport(report);
+        setProdutores(produtoresApi as Produtor[]);
+        localStorage.setItem("produtores", JSON.stringify(produtoresApi));
+        setOrigemDados("api");
+      })
+      .catch((error) => {
+        console.warn("Dashboard usando dados locais.", error);
+        setOrigemDados("local");
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const culturas = useMemo(
     () => produtores.flatMap((produtor) => produtor.culturasAgricolas || []),
@@ -193,8 +189,25 @@ export default function PainelAdmin() {
     const publico = toChartItems(countBy(produtores, (produtor) => produtor.publico), 4);
     const sexo = toChartItems(countBy(produtores, (produtor) => produtor.sexo), 4);
 
+    if (dashboardReport) {
+      return {
+        culturasPorTipo: dashboardReport.producao_por_cultura,
+        localizacao: dashboardReport.produtores_por_zona,
+        publico: dashboardReport.produtores_por_publico,
+        sexo: dashboardReport.produtores_por_sexo,
+      };
+    }
+
     return { culturasPorTipo, localizacao, publico, sexo };
-  }, [culturas, produtores]);
+  }, [culturas, dashboardReport, produtores]);
+
+  const totais = {
+    produtores: dashboardReport?.totais.produtores ?? produtores.length,
+    culturas: dashboardReport?.totais.culturas ?? culturas.length,
+    registros: dashboardReport?.totais.registros ?? produtores.length,
+    carteiras: totalCarteiras,
+    propriedades: totalPropriedades,
+  };
 
   const ultimosRegistros = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -230,11 +243,11 @@ export default function PainelAdmin() {
 
           <div className="grid grid-cols-3 gap-2 text-center">
             <div className="rounded-lg border border-white/12 bg-white/8 px-4 py-3">
-              <p className="text-2xl font-bold">{produtores.length}</p>
+              <p className="text-2xl font-bold">{totais.produtores}</p>
               <p className="text-xs text-white/70">Produtores</p>
             </div>
             <div className="rounded-lg border border-white/12 bg-white/8 px-4 py-3">
-              <p className="text-2xl font-bold">{culturas.length}</p>
+              <p className="text-2xl font-bold">{totais.culturas}</p>
               <p className="text-xs text-white/70">Culturas</p>
             </div>
             <div className="rounded-lg border border-white/12 bg-white/8 px-4 py-3">
@@ -246,35 +259,35 @@ export default function PainelAdmin() {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        <StatCard
+        <MetricCard
           title="Total de produtores"
-          value={produtores.length}
-          description="Cadastros ativos no armazenamento local."
+          value={totais.produtores}
+          description={origemDados === "api" ? "Cadastros vindos da API." : "Cadastros locais."}
           icon={<Users className="h-5 w-5" />}
         />
-        <StatCard
+        <MetricCard
           title="Propriedades"
-          value={totalPropriedades}
+          value={totais.propriedades}
           description="Propriedades identificadas nos cadastros."
           icon={<MapPinned className="h-5 w-5" />}
           tone="blue"
         />
-        <StatCard
+        <MetricCard
           title="Culturas"
-          value={culturas.length}
+          value={totais.culturas}
           description="Culturas agrícolas vinculadas aos produtores."
           icon={<Sprout className="h-5 w-5" />}
         />
-        <StatCard
+        <MetricCard
           title="Carteiras"
-          value={totalCarteiras}
+          value={totais.carteiras}
           description="Produtores com carteira informada."
           icon={<WalletCards className="h-5 w-5" />}
           tone="amber"
         />
-        <StatCard
+        <MetricCard
           title="Registros"
-          value={produtores.length}
+          value={totais.registros}
           description="Registros disponíveis para acompanhamento."
           icon={<ClipboardList className="h-5 w-5" />}
           tone="blue"
@@ -385,7 +398,7 @@ export default function PainelAdmin() {
           <span>{ultimosRegistros.length} registros exibidos</span>
           <span className="inline-flex items-center gap-1 font-semibold text-[#184b36]">
             <FileText className="h-4 w-4" />
-            Dados locais
+            {origemDados === "api" ? "Dados da API" : "Dados locais"}
           </span>
         </div>
       </section>

@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { MapPin, Plus, Trash2, Edit2, Save, X } from "lucide-react";
+import {
+  deleteComunidadeApi,
+  saveComunidadeApi,
+} from "../../services/resourcesApi";
 
 interface Comunidade {
   id: string;
@@ -24,26 +28,35 @@ export default function GerenciadorComunidades() {
 
   const gerarId = () => Date.now().toString();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (editando) {
-      // Atualizar
+      const comunidadeAtualizada = { ...editando, ...formData };
+      const comunidadeSalva = await saveComunidadeApi(comunidadeAtualizada).catch(
+        (error) => {
+          console.warn("API indisponível, atualizando comunidade localmente.", error);
+          return comunidadeAtualizada;
+        },
+      );
       const novasComunidades = comunidades.map(c =>
-        c.id === editando.id
-          ? { ...editando, ...formData }
-          : c
+        c.id === editando.id ? comunidadeSalva : c
       );
       setComunidades(novasComunidades);
       localStorage.setItem("comunidades", JSON.stringify(novasComunidades));
     } else {
-      // Criar nova
       const novaComunidade: Comunidade = {
         id: gerarId(),
         ...formData,
         dataCadastro: new Date().toISOString(),
       };
-      const novasComunidades = [...comunidades, novaComunidade];
+      const comunidadeSalva = await saveComunidadeApi(novaComunidade).catch(
+        (error) => {
+          console.warn("API indisponível, criando comunidade localmente.", error);
+          return novaComunidade;
+        },
+      );
+      const novasComunidades = [...comunidades, comunidadeSalva];
       setComunidades(novasComunidades);
       localStorage.setItem("comunidades", JSON.stringify(novasComunidades));
     }
@@ -67,8 +80,11 @@ export default function GerenciadorComunidades() {
     setMostrarFormulario(true);
   };
 
-  const handleExcluir = (id: string) => {
+  const handleExcluir = async (id: string) => {
     if (confirm("Deseja realmente excluir esta comunidade?")) {
+      await deleteComunidadeApi(id).catch((error) => {
+        console.warn("API indisponível, excluindo comunidade localmente.", error);
+      });
       const novasComunidades = comunidades.filter(c => c.id !== id);
       setComunidades(novasComunidades);
       localStorage.setItem("comunidades", JSON.stringify(novasComunidades));
@@ -76,7 +92,7 @@ export default function GerenciadorComunidades() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="idam-form space-y-6">
       {/* HEADER */}
       <div className="bg-linear-to-r from-teal-600 to-teal-700 rounded-xl p-6 shadow-lg text-white">
         <div className="flex items-center justify-between">

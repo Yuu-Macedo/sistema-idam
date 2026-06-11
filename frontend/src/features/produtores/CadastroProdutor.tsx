@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import {
@@ -11,6 +11,7 @@ import {
   MeliponiculturaList,
   type AbelhaItem,
 } from "./MeliponiculturaList";
+import { fetchProdutoresApi, saveProdutorApi } from "../../services/produtoresApi";
 
 interface CadastroProdutorFormData {
   cadastradoPorId?: string;
@@ -32,7 +33,7 @@ interface CadastroProdutorFormData {
   estadoCivil: string;
   raca: string;
   sexo: string;
-  publico: string; // Homem, Mulher, Jovem
+  publico: string;
 
   // ================== ENDEREÇO ==================
   logradouro: string;
@@ -242,7 +243,7 @@ interface Produtor extends CadastroProdutorFormData {
   estadoCivil: string;
   raca: string;
   sexo: string;
-  publico: string; // Homem, Mulher, Jovem
+  publico: string;
 
   // ================== ENDEREÇO ==================
   logradouro: string;
@@ -412,6 +413,21 @@ interface Documento {
   base64: string;
 }
 
+const CAMPOS_OBRIGATORIOS_PRODUTOR: Array<{
+  campo: keyof CadastroProdutorFormData;
+  label: string;
+  step: number;
+}> = [
+  { campo: "rg", label: "RG", step: 1 },
+  { campo: "dataNascimento", label: "Data de Nascimento", step: 1 },
+  { campo: "telefone", label: "Telefone", step: 1 },
+  { campo: "sexo", label: "Sexo", step: 1 },
+  { campo: "publico", label: "Publico", step: 1 },
+  { campo: "logradouro", label: "Logradouro e Numero", step: 2 },
+  { campo: "municipio", label: "Municipio", step: 2 },
+  { campo: "uf", label: "UF", step: 2 },
+];
+
 export default function CadastroProdutor() {
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [modoEdicao, setModoEdicao] = useState(false);
@@ -573,12 +589,6 @@ export default function CadastroProdutor() {
       producaoObtidaAgricultura: "",
       culturasAgricolas: [],
       producaoOrganica: false,
-      paa: {
-        participa: false,
-        perfil: "",
-        propriedade: "",
-        observacoes: "",
-      },
       carteiraProdutor: {
         numero: "",
         emissao: "",
@@ -647,6 +657,23 @@ export default function CadastroProdutor() {
       return [];
     }
   };
+
+  useEffect(() => {
+    let ativo = true;
+
+    fetchProdutoresApi()
+      .then((produtoresApi) => {
+        if (!ativo || produtoresApi.length === 0) return;
+        localStorage.setItem("produtores", JSON.stringify(produtoresApi));
+      })
+      .catch((error) => {
+        console.warn("Não foi possível carregar produtores da API.", error);
+      });
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   const tiposSelecionados = formData.atividades.flatMap(
     (atividade) => atividade.tipos,
@@ -850,12 +877,6 @@ export default function CadastroProdutor() {
         acessoLocalizacao: produtor.acessoLocalizacao || "",
         culturasAgricolas: produtor.culturasAgricolas || [],
         producaoOrganica: produtor.producaoOrganica || false,
-        paa: produtor.paa || {
-          participa: false,
-          perfil: "",
-          propriedade: "",
-          observacoes: "",
-        },
         carteiraProdutor: produtor.carteiraProdutor || {
           numero: produtor.numeroCarteiraProdutor || "",
           emissao: "",
@@ -965,12 +986,6 @@ export default function CadastroProdutor() {
       producaoObtidaAgricultura: "",
       culturasAgricolas: [],
       producaoOrganica: false,
-      paa: {
-        participa: false,
-        perfil: "",
-        propriedade: "",
-        observacoes: "",
-      },
       carteiraProdutor: {
         numero: "",
         emissao: "",
@@ -1033,7 +1048,7 @@ export default function CadastroProdutor() {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensagemErro("");
     setMensagemSucesso("");
@@ -1057,6 +1072,16 @@ export default function CadastroProdutor() {
       return;
     }
 
+    const campoObrigatorioVazio = CAMPOS_OBRIGATORIOS_PRODUTOR.find(
+      ({ campo }) => !String(formData[campo] || "").trim(),
+    );
+
+    if (campoObrigatorioVazio) {
+      setMensagemErro(`Informe o campo obrigatorio: ${campoObrigatorioVazio.label}.`);
+      setCurrentStep(campoObrigatorioVazio.step);
+      return;
+    }
+
     const cpfDuplicado = produtores.some(
       (p: Produtor) =>
         limparCpf(p.cpf) === cpfAtualLimpo &&
@@ -1069,44 +1094,61 @@ export default function CadastroProdutor() {
       return;
     }
 
+    const produtorPayload = {
+      ...formData,
+      dataAtualizacao: new Date().toISOString(),
+      cadastradoPorId: usuarioLogado?.id || "",
+      cadastradoPorNome: usuarioLogado?.nome || "",
+      cadastradoPorEmail: usuarioLogado?.email || "",
+      cadastradoPorTipo: usuarioLogado?.tipo || "tecnico",
+    };
 
-    if (modoEdicao && produtorEmEdicaoId) {
-      const atualizados = produtores.map((p: Produtor) =>
-        p.id === produtorEmEdicaoId
-          ? {
-              ...p,
-              ...formData,
-              dataAtualizacao: new Date().toISOString(),
-            }
-          : p,
+    try {
+      const produtorSalvo = await saveProdutorApi(
+        produtorPayload,
+        modoEdicao && produtorEmEdicaoId ? produtorEmEdicaoId : undefined,
       );
 
-      localStorage.setItem(
-        "produtores",
-        JSON.stringify(atualizados),
+      const produtoresAtualizados =
+        modoEdicao && produtorEmEdicaoId
+          ? produtores.map((p: Produtor) =>
+              p.id === produtorEmEdicaoId ? { ...p, ...produtorSalvo } : p,
+            )
+          : [...produtores, produtorSalvo];
+
+      localStorage.setItem("produtores", JSON.stringify(produtoresAtualizados));
+      setMensagemSucesso(
+        modoEdicao
+          ? "Produtor atualizado com sucesso na API."
+          : "Produtor cadastrado com sucesso na API.",
       );
+    } catch (error) {
+      console.warn("API indisponível, salvando produtor localmente.", error);
 
-      setMensagemSucesso("Produtor atualizado com sucesso.");
-    } else {
-      const novoProdutor = {
-        ...formData,
-        id: Date.now().toString(),
-        dataCadastro: new Date().toISOString(),
+      if (modoEdicao && produtorEmEdicaoId) {
+        const atualizados = produtores.map((p: Produtor) =>
+          p.id === produtorEmEdicaoId
+            ? {
+                ...p,
+                ...produtorPayload,
+                dataAtualizacao: new Date().toISOString(),
+              }
+            : p,
+        );
 
-        cadastradoPorId: usuarioLogado?.id || "",
-        cadastradoPorNome: usuarioLogado?.nome || "",
-        cadastradoPorEmail: usuarioLogado?.email || "",
-        cadastradoPorTipo: usuarioLogado?.tipo || "tecnico",
-      };
+        localStorage.setItem("produtores", JSON.stringify(atualizados));
+        setMensagemSucesso("Produtor atualizado localmente.");
+      } else {
+        const novoProdutor = {
+          ...produtorPayload,
+          id: Date.now().toString(),
+          dataCadastro: new Date().toISOString(),
+        };
 
-      produtores.push(novoProdutor);
-
-      localStorage.setItem(
-        "produtores",
-        JSON.stringify(produtores),
-      );
-
-      setMensagemSucesso("Produtor cadastrado com sucesso.");
+        produtores.push(novoProdutor);
+        localStorage.setItem("produtores", JSON.stringify(produtores));
+        setMensagemSucesso("Produtor cadastrado localmente.");
+      }
     }
 
     setFormData({
@@ -1237,12 +1279,6 @@ export default function CadastroProdutor() {
       producaoObtidaAgricultura: "",
       culturasAgricolas: [],
       producaoOrganica: false,
-      paa: {
-        participa: false,
-        perfil: "",
-        propriedade: "",
-        observacoes: "",
-      },
       carteiraProdutor: {
         numero: "",
         emissao: "",
@@ -1786,9 +1822,20 @@ export default function CadastroProdutor() {
                   required
                 >
                   <option value="">Selecione</option>
-                  <option value="Homem">Homem</option>
-                  <option value="Mulher">Mulher</option>
-                  <option value="Jovem">Jovem</option>
+                  <option value="Homem jovem - 20 a 29 anos">
+                    Homem jovem - 20 a 29 anos
+                  </option>
+                  <option value="Homem adulto - 30 a 59 anos">
+                    Homem adulto - 30 a 59 anos
+                  </option>
+                  <option value="Mulher jovem - 20 a 29 anos">
+                    Mulher jovem - 20 a 29 anos
+                  </option>
+                  <option value="Mulher adulta - 30 a 59 anos">
+                    Mulher adulta - 30 a 59 anos
+                  </option>
+                  <option value="Jovem - 13 anos">Jovem - 13 anos</option>
+                  <option value="Idoso - 60 anos">Idoso - 60 anos</option>
                 </select>
               </div>    
             </div>
@@ -2395,6 +2442,7 @@ export default function CadastroProdutor() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {[
+                  "Agricultor",
                   "Agricultor Familiar",
                   "Quilombola",
                   "Ribeirinho",
@@ -2428,120 +2476,6 @@ export default function CadastroProdutor() {
                     </label>
                   );
                 })}
-              </div>
-            </div>
-
-            <div className="bg-card rounded-xl border border-border p-6 sm:p-8 shadow-sm">
-              <div className="mb-6">
-                <h2 className="text-foreground text-lg font-semibold">
-                  PAA
-                </h2>
-                <p className="text-muted-foreground text-sm">
-                  Informações de perfil e propriedade vinculadas ao produtor
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <label className="flex items-center gap-3 rounded-lg border border-border bg-input-background p-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.paa?.participa || false}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        paa: {
-                          ...(formData.paa || {
-                            perfil: "",
-                            propriedade: "",
-                            observacoes: "",
-                            participa: false,
-                          }),
-                          participa: e.target.checked,
-                        },
-                      })
-                    }
-                  />
-                  <span className="font-medium text-foreground">
-                    Participa ou pretende participar do PAA
-                  </span>
-                </label>
-
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">
-                      Perfil no PAA
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.paa?.perfil || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          paa: {
-                            ...(formData.paa || {
-                              participa: false,
-                              propriedade: "",
-                              observacoes: "",
-                              perfil: "",
-                            }),
-                            perfil: e.target.value,
-                          },
-                        })
-                      }
-                      className="w-full rounded-lg border border-border bg-input-background px-4 py-2.5"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-foreground">
-                      Dados da propriedade para PAA
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.paa?.propriedade || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          paa: {
-                            ...(formData.paa || {
-                              participa: false,
-                              perfil: "",
-                              observacoes: "",
-                              propriedade: "",
-                            }),
-                            propriedade: e.target.value,
-                          },
-                        })
-                      }
-                      className="w-full rounded-lg border border-border bg-input-background px-4 py-2.5"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="mb-2 block text-sm font-medium text-foreground">
-                      Observações do PAA
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={formData.paa?.observacoes || ""}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          paa: {
-                            ...(formData.paa || {
-                              participa: false,
-                              perfil: "",
-                              propriedade: "",
-                              observacoes: "",
-                            }),
-                            observacoes: e.target.value,
-                          },
-                        })
-                      }
-                      className="w-full resize-none rounded-lg border border-border bg-input-background px-4 py-2.5"
-                    />
-                  </div>
-                </div>
               </div>
             </div>
 
