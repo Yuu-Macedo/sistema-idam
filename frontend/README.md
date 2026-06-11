@@ -1,73 +1,115 @@
-# React + TypeScript + Vite
+# Frontend Sistema IDAM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interface web do Sistema IDAM, desenvolvida em React, TypeScript e Vite.
 
-Currently, two official plugins are available:
+## Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- Radix UI
+- lucide-react
+- react-router-dom
+- react-to-print
+- Recharts
 
-## React Compiler
+## Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+URL local:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+http://localhost:5173
 ```
+
+## Variaveis De Ambiente
+
+Crie `frontend/.env` quando precisar trocar a URL da API:
+
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+Sem essa variavel, o frontend usa `http://localhost:8000/api`.
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
+Tambem e possivel rodar pela raiz:
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
+```
+
+## Estrutura Principal
+
+```text
+src/
+  app/          Rotas e shell principal
+  components/   Componentes compartilhados e UI base
+  constants/    Opcoes de formularios
+  features/     Modulos funcionais
+  hooks/        Hooks reutilizaveis
+  pages/        Entradas de paginas
+  services/     Clientes de API e persistencia local
+  styles/       Estilos globais, tema e impressao
+  types/        Tipos TypeScript compartilhados
+```
+
+## Modulos Da Interface
+
+- Login e controle de sessao.
+- Dashboard administrativo.
+- Cadastro e relatorio de produtores.
+- Atendimento e historico tecnico.
+- Emissao de documentos.
+- Cronograma de visitas.
+- Comunidades e veiculos.
+- Recomendacoes tecnicas.
+
+## Integracao Com A API
+
+O cliente HTTP fica em:
+
+```text
+src/services/apiClient.ts
+```
+
+Ele usa JWT salvo pelo fluxo de autenticacao e envia:
+
+```text
+Authorization: Bearer <access_token>
+```
+
+Quando a API fica indisponivel, algumas telas mantem fallback local em
+`localStorage` para preservar a operacao basica.
+
+## Validacao
+
+```bash
+npm run build
+npm run lint
+```
+
+O build valida TypeScript e empacota a aplicacao para producao.
+
+## Impressao E Documentos
+
+Os componentes de documentos usam `react-to-print` e estilos de impressao em
+cada modelo. Ao alterar declaracoes, SEFAZ ou documentos de atendimento, teste a
+visualizacao e o comando de impressao/PDF.

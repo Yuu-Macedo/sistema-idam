@@ -1,6 +1,6 @@
 # Backend Sistema IDAM
 
-API RESTful em Django REST Framework para o Sistema IDAM.
+API RESTful do Sistema IDAM, desenvolvida com Django REST Framework.
 
 ## Stack
 
@@ -8,70 +8,13 @@ API RESTful em Django REST Framework para o Sistema IDAM.
 - Django 5
 - Django REST Framework
 - SimpleJWT
-- PostgreSQL via `DATABASE_URL`
-- CORS para React/Vite
 - django-filter
 - drf-spectacular
-- Docker e Docker Compose
+- django-cors-headers
+- SQLite como fallback local
+- PostgreSQL via `DATABASE_URL`
 
-## Rodar Com Docker
-
-Na raiz do projeto:
-
-```bash
-docker compose up --build
-```
-
-A API ficará disponível em:
-
-```text
-http://localhost:8000/api/
-```
-
-O Swagger ficará em:
-
-```text
-http://localhost:8000/api/docs/
-```
-
-O Compose cria:
-
-- `db`: PostgreSQL 16
-- `backend`: Django/DRF na porta `8000`
-
-As migrations rodam automaticamente quando o container do backend sobe.
-
-O `docker-compose.yml` já define variáveis de desenvolvimento. Para customizar valores locais, copie:
-
-```bash
-copy backend\.env.example backend\.env
-```
-
-Para criar superusuário com Docker:
-
-```bash
-docker compose exec backend python manage.py createsuperuser
-```
-
-Para rodar testes com Docker:
-
-```bash
-docker compose exec backend python manage.py test
-```
-
-Para parar:
-
-```bash
-docker compose down
-```
-
-Para apagar também o volume do PostgreSQL:
-
-```bash
-docker compose down -v
-```
-
-## Rodar Sem Docker
+## Setup Local
 
 ```bash
 cd backend
@@ -79,39 +22,63 @@ python -m venv .venv
 .venv\Scripts\activate
 python -m pip install -r requirements.txt
 copy .env.example .env
-```
-
-Edite `.env` e ajuste `SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, `DATABASE_URL` e `CORS_ALLOWED_ORIGINS`.
-
-Para desenvolvimento local sem PostgreSQL configurado, o projeto usa SQLite como fallback quando `DATABASE_URL` não estiver definido. Para produção, use PostgreSQL em `DATABASE_URL`.
-
-## Banco De Dados
-
-```bash
 python manage.py migrate
 python manage.py createsuperuser
-```
-
-## Rodar API Local
-
-```bash
 python manage.py runserver
 ```
 
-API local:
+URLs:
 
-```text
-http://localhost:8000/api/
+- API: `http://localhost:8000/api/`
+- Admin: `http://localhost:8000/admin/`
+- Schema OpenAPI: `http://localhost:8000/api/schema/`
+- Swagger: `http://localhost:8000/api/docs/`
+
+## Docker
+
+Na raiz do repositorio:
+
+```bash
+docker compose up --build
 ```
 
-## Documentação
+Servicos:
 
-```text
-http://localhost:8000/api/schema/
-http://localhost:8000/api/docs/
+- `db`: PostgreSQL 16.
+- `backend`: API Django na porta `8000`.
+
+Comandos uteis:
+
+```bash
+docker compose exec backend python manage.py createsuperuser
+docker compose exec backend python manage.py test
+docker compose down
+docker compose down -v
 ```
 
-## Autenticação
+## Variaveis De Ambiente
+
+Copie o exemplo:
+
+```bash
+copy backend\.env.example backend\.env
+```
+
+Principais chaves:
+
+```env
+SECRET_KEY=change-me-in-production
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1,0.0.0.0,backend
+DATABASE_URL=postgres://idam_user:idam_password@db:5432/sistema_idam
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+ACCESS_TOKEN_LIFETIME_MINUTES=60
+REFRESH_TOKEN_LIFETIME_DAYS=7
+```
+
+Sem `DATABASE_URL`, o projeto usa SQLite local.
+
+## Autenticacao
 
 ```text
 POST /api/auth/login/
@@ -120,13 +87,15 @@ GET  /api/auth/me/
 POST /api/auth/logout/
 ```
 
-Use o token `access` como:
+Use o token de acesso no header:
 
 ```text
 Authorization: Bearer <access_token>
 ```
 
 ## Endpoints Principais
+
+Produtores e relacionamentos:
 
 ```text
 /api/produtores/
@@ -137,48 +106,56 @@ Authorization: Bearer <access_token>
 /api/produtores/{id}/paa/
 /api/produtores/{id}/criacao-animal/
 /api/produtores/{id}/meliponicultura/
+```
 
+Recursos gerais:
+
+```text
+/api/usuarios/
 /api/culturas/
 /api/registros/
 /api/carteiras/
 /api/localizacoes/
 /api/criacoes-animais/
 /api/avicultura/
+/api/paa/
 /api/especies-abelhas/
 /api/meliponicultura/
-/api/relatorios/dashboard/
-
 /api/comunidades/
 /api/veiculos/
 /api/cronogramas/
 /api/recomendacoes-tecnicas/
 /api/atendimentos/
 /api/documentos-emitidos/
+/api/relatorios/dashboard/
 ```
 
 ## Testes
 
 ```bash
-python manage.py test
+python manage.py test apps
+python manage.py makemigrations --check --dry-run
 ```
 
-## Integração Com Frontend
+No Windows, a partir da raiz:
 
-O CORS já permite:
-
-```text
-http://localhost:5173
-http://127.0.0.1:5173
+```bash
+backend\.venv\Scripts\python.exe backend\manage.py test apps
+backend\.venv\Scripts\python.exe backend\manage.py makemigrations --check --dry-run
 ```
 
-No frontend, configure a URL base da API como:
+## Modelos E Migrations
 
-```text
-http://localhost:8000/api
+Sempre que alterar modelos:
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
 ```
 
-Em projetos Vite, use:
+Antes de enviar mudancas, confira:
 
-```text
-VITE_API_URL=http://localhost:8000/api
+```bash
+python manage.py makemigrations --check --dry-run
+python manage.py test apps
 ```
