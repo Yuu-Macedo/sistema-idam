@@ -81,6 +81,10 @@ export function saveAuthTokens(access: string, refresh: string) {
   localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, refresh);
 }
 
+export function saveAccessToken(access: string) {
+  localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, access);
+}
+
 export function getAccessToken() {
   return localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY);
 }

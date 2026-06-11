@@ -1,11 +1,14 @@
 from datetime import timedelta
 from pathlib import Path
+import sys
 
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
-from decouple import Csv, config
+from decouple import AutoConfig, Csv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+config = AutoConfig(search_path=BASE_DIR)
+IS_TESTING = "test" in sys.argv
 
 DEFAULT_DEV_SECRET_KEY = "dev-only-idam-secret-key"
 SECRET_KEY = config("SECRET_KEY", default=DEFAULT_DEV_SECRET_KEY)
@@ -119,6 +122,19 @@ CORS_ALLOWED_ORIGINS = config(
     cast=Csv(),
 )
 CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="", cast=Csv())
+
+SECURE_SSL_REDIRECT = False if IS_TESTING else config("SECURE_SSL_REDIRECT", default=not DEBUG, cast=bool)
+SESSION_COOKIE_SECURE = False if IS_TESTING else config("SESSION_COOKIE_SECURE", default=not DEBUG, cast=bool)
+CSRF_COOKIE_SECURE = False if IS_TESTING else config("CSRF_COOKIE_SECURE", default=not DEBUG, cast=bool)
+SECURE_HSTS_SECONDS = config("SECURE_HSTS_SECONDS", default=0 if DEBUG else 31536000, cast=int)
+SECURE_HSTS_INCLUDE_SUBDOMAINS = config(
+    "SECURE_HSTS_INCLUDE_SUBDOMAINS",
+    default=not DEBUG,
+    cast=bool,
+)
+SECURE_HSTS_PRELOAD = config("SECURE_HSTS_PRELOAD", default=False, cast=bool)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -154,4 +170,18 @@ SPECTACULAR_SETTINGS = {
     "DESCRIPTION": "API RESTful para gestão rural, produtores, registros e produção do IDAM.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+}
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": config("LOG_LEVEL", default="INFO"),
+    },
 }

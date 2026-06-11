@@ -11,6 +11,7 @@ import {
   User,
 } from "lucide-react";
 import type { TipoUsuario } from "../../types/app";
+import { getValidationMessage, loginSchema } from "../../services/validationSchemas";
 
 interface LoginProps {
   onLogin: (
@@ -54,8 +55,9 @@ export default function Login({ onLogin }: LoginProps) {
     e.preventDefault();
     setErro("");
 
-    if (!email || !senha) {
-      setErro("Informe email e senha para acessar o sistema.");
+    const validation = loginSchema.safeParse({ email, senha });
+    if (!validation.success) {
+      setErro(getValidationMessage(validation.error));
       return;
     }
 

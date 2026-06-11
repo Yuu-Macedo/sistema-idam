@@ -1,4 +1,6 @@
 import { apiRequest } from "./apiClient";
+import { writeResourceSnapshot } from "./localCache";
+import { enqueueSyncOperation, isTransientSyncError } from "./syncQueue";
 
 interface PaginatedResponse<T> {
   results: T[];
@@ -12,23 +14,46 @@ async function fetchList(path: string) {
 }
 
 async function createResource(path: string, payload: AnyRecord) {
-  return apiRequest<AnyRecord>(path, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  });
+  try {
+    return await apiRequest<AnyRecord>(path, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    if (isTransientSyncError(error)) {
+      enqueueSyncOperation({ path, method: "POST", payload });
+    }
+    throw error;
+  }
 }
 
 async function updateResource(path: string, id: string, payload: AnyRecord) {
-  return apiRequest<AnyRecord>(`${path}${id}/`, {
-    method: "PATCH",
-    body: JSON.stringify(payload),
-  });
+  const resourcePath = `${path}${id}/`;
+  try {
+    return await apiRequest<AnyRecord>(resourcePath, {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    if (isTransientSyncError(error)) {
+      enqueueSyncOperation({ path: resourcePath, method: "PATCH", payload });
+    }
+    throw error;
+  }
 }
 
 async function deleteResource(path: string, id: string) {
-  await apiRequest(`${path}${id}/`, {
-    method: "DELETE",
-  });
+  const resourcePath = `${path}${id}/`;
+  try {
+    await apiRequest(resourcePath, {
+      method: "DELETE",
+    });
+  } catch (error) {
+    if (isTransientSyncError(error)) {
+      enqueueSyncOperation({ path: resourcePath, method: "DELETE" });
+    }
+    throw error;
+  }
 }
 
 const mapComunidade = (item: AnyRecord) => ({
@@ -135,13 +160,14 @@ export async function syncApiResourcesToLocalStorage() {
     fetchList("/documentos-emitidos/").then((items) => items.map(mapDocumento)),
   ]);
 
-  localStorage.setItem("comunidades", JSON.stringify(comunidades));
-  localStorage.setItem("veiculosUnidade", JSON.stringify(veiculos));
-  localStorage.setItem("cronogramas", JSON.stringify(cronogramas));
-  localStorage.setItem("visitas", JSON.stringify(cronogramas));
-  localStorage.setItem("recomendacoesTecnicas", JSON.stringify(recomendacoes));
-  localStorage.setItem("atendimentos", JSON.stringify(atendimentos));
-  localStorage.setItem("historicoDocumentos", JSON.stringify(documentos));
+  writeResourceSnapshot({
+    comunidades,
+    veiculos,
+    cronogramas,
+    recomendacoes,
+    atendimentos,
+    documentos,
+  });
 }
 
 export async function saveComunidadeApi(comunidade: AnyRecord) {

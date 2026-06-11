@@ -1,5 +1,7 @@
 import type { ProdutorBase } from "../types/produtor";
 import { apiRequest } from "./apiClient";
+import { enqueueSyncOperation, isTransientSyncError } from "./syncQueue";
+import { produtorSchema } from "./validationSchemas";
 
 type AnyRecord = Record<string, any>;
 
@@ -99,6 +101,8 @@ function mapApiProdutorToFrontend(produtor: AnyRecord): ProdutorBase {
 }
 
 function mapFrontendProdutorToApi(produtor: AnyRecord) {
+  produtorSchema.parse(produtor);
+
   const endereco = [
     produtor.logradouro,
     produtor.bairro,
@@ -133,13 +137,22 @@ export async function fetchProdutoresApi(): Promise<ProdutorBase[]> {
 
 export async function saveProdutorApi(produtor: AnyRecord, produtorId?: string) {
   const isUpdate = Boolean(produtorId);
-  const saved = await apiRequest<AnyRecord>(
-    isUpdate ? `/produtores/${produtorId}/` : "/produtores/",
-    {
-      method: isUpdate ? "PATCH" : "POST",
-      body: JSON.stringify(mapFrontendProdutorToApi(produtor)),
-    },
-  );
+  const path = isUpdate ? `/produtores/${produtorId}/` : "/produtores/";
+  const method = isUpdate ? "PATCH" : "POST";
+  const payload = mapFrontendProdutorToApi(produtor);
+  let saved: AnyRecord;
+
+  try {
+    saved = await apiRequest<AnyRecord>(path, {
+      method,
+      body: JSON.stringify(payload),
+    });
+  } catch (error) {
+    if (isTransientSyncError(error)) {
+      enqueueSyncOperation({ path, method, payload });
+    }
+    throw error;
+  }
 
   const id = saved.id;
 

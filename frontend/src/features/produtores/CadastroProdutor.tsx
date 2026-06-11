@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, ChevronLeft, Check, Search, Edit, X, Plus, User } from "lucide-react";
+import { ChevronRight, ChevronLeft, Search, Edit, X, Plus, User } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import {
   CulturasAgricolasList,
@@ -12,6 +12,11 @@ import {
   type AbelhaItem,
 } from "./MeliponiculturaList";
 import { fetchProdutoresApi, saveProdutorApi } from "../../services/produtoresApi";
+import {
+  cadastroProdutorSteps,
+  tiposPecuariaComQuantidade,
+} from "./cadastroProdutorConfig";
+import { CadastroProdutorProgress } from "./CadastroProdutorProgress";
 
 interface CadastroProdutorFormData {
   cadastradoPorId?: string;
@@ -762,52 +767,7 @@ export default function CadastroProdutor() {
     "Extrativismo Mineral",
   );
 
-  const steps = [
-    {
-      number: 1,
-      title: "Dados Pessoais",
-      description: "Informações do produtor",
-    },
-    {
-      number: 2,
-      title: "Endereço e Localização",
-      description: "Dados de endereço e propriedade",
-    },
-    {
-      number: 3,
-      title: "Perfil e Propriedade",
-      description: "Perfil e situação do imóvel",
-    },
-    {
-      number: 4,
-      title: "Área e Atividades",
-      description: "Dados da área e atividades",
-    },
-    {
-      number: 5,
-      title: "Registro do Produtor",
-      description: "Informações de pesca e registro",
-    },
-    {
-      number: 6,
-      title: "Responsáveis Técnicos",
-      description: "Técnicos e observações",
-    },
-  ];
-
-  const tiposPecuariaComQuantidade = [
-    "Bovinocultura",
-    "Avicultura",
-    "Galinha",
-    "Pato",
-    "Suinocultura",
-    "Bubalinocultura",
-    "Caprinocultura",
-    "Ovinocultura",
-    "Equinos",
-    "Codorna",
-    "Pato Doméstico",
-  ];
+  const steps = cadastroProdutorSteps;
   const possuiPesca =
     possuiPescaArtesanal ||
     possuiPescaComercial ||
@@ -1469,73 +1429,12 @@ export default function CadastroProdutor() {
         )}
       </div>
 
-      <section className="rounded-2xl border border-[#d8d6c9] bg-[#fbfaf5] p-5 shadow-sm">
-        <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#9b741d]">
-              Roteiro de preenchimento
-            </p>
-            <h3 className="mt-1 text-lg font-semibold text-[#13251d]">
-              {steps[currentStep - 1]?.title || "Revisão"}
-            </h3>
-            <p className="text-sm text-[#607368]">
-              {steps[currentStep - 1]?.description ||
-                "Confira os dados antes de finalizar."}
-            </p>
-          </div>
-          <div className="rounded-lg border border-[#ded9c8] bg-white px-3 py-2 text-sm font-semibold text-[#466255]">
-            {Math.round((currentStep / totalSteps) * 100)}% completo
-          </div>
-        </div>
-
-        <div className="h-2 overflow-hidden rounded-full bg-[#e8e2d4]">
-          <div
-            className="h-full rounded-full bg-[#e6c46a] transition-all"
-            style={{
-              width: `${Math.round((currentStep / totalSteps) * 100)}%`,
-            }}
-          />
-        </div>
-
-        <div className="mt-5 grid grid-cols-1 gap-2 md:grid-cols-3 xl:grid-cols-6">
-          {steps.map((step) => (
-            <button
-              type="button"
-              key={step.number}
-              onClick={() => setCurrentStep(step.number)}
-              className={`flex items-start gap-3 rounded-xl border p-3 text-left transition ${
-                step.number === currentStep
-                  ? "border-[#e6c46a] bg-[#fbf3da] shadow-sm"
-                  : step.number < currentStep
-                    ? "border-[#c8d7c1] bg-[#f0f6ea]"
-                    : "border-[#ded9c8] bg-white hover:bg-[#f4f0e7]"
-              }`}
-            >
-              <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-sm font-semibold ${
-                  step.number <= currentStep
-                    ? "bg-[#173f31] text-white"
-                    : "bg-[#e8e2d4] text-[#607368]"
-                }`}
-              >
-                {step.number < currentStep ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  step.number
-                )}
-              </div>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold leading-tight text-[#13251d]">
-                  {step.title}
-                </p>
-                <p className="mt-1 line-clamp-2 text-xs leading-5 text-[#607368]">
-                  {step.description}
-                </p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+      <CadastroProdutorProgress
+        currentStep={currentStep}
+        totalSteps={totalSteps}
+        steps={steps}
+        onStepChange={setCurrentStep}
+      />
 
       {/* Form */}
       {mensagemErro && (

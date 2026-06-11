@@ -1,6 +1,5 @@
 import { useRef, useState } from "react";
 import {
-  Search,
   User,
   Phone,
   Mail,
@@ -10,25 +9,18 @@ import {
 } from "lucide-react";
 import { useReactToPrint } from "react-to-print";
 import AtendimentoDocumento from "./AtendimentoDocumento";
+import {
+  buildConfiguracoesAgricultura,
+  buildConfiguracoesApicultura,
+  buildConfiguracoesExtrativismo,
+  buildConfiguracoesPecuaria,
+} from "./atendimentoConfig";
+import { AtendimentoFiltros } from "./AtendimentoFiltros";
+import { AtendimentoProdutoresList } from "./AtendimentoProdutoresList";
+import type { ProdutorAtendimento } from "./types";
 import { saveAtendimentoApi } from "../../services/resourcesApi";
 
-interface Produtor {
-  id: string;
-  nome: string;
-  cpf: string;
-  telefone: string;
-  email: string;
-  endereco: string;
-  cidade: string;
-  estado: string;
-  dataCadastro?: string;
-  atividades?: {
-    categoria: string;
-    tipos: string[];
-  }[];
-}
-
-
+type Produtor = ProdutorAtendimento;
 
 interface DadosAtendimento {
   observacoes?: string;
@@ -576,33 +568,14 @@ export default function Atendimento() {
   const possuiCulturasIndustriais = tiposSelecionados.includes(
     "Culturas Industriais",
   ) || atividadesAdicionais.agricultura.includes("Culturas Industriais");
-  const configuracoesAgricultura: ConfiguracaoAtendimento<AgriculturaKey>[] = [
-    {
-      condicao: possuiGraos,
-      key: "graos",
-      titulo: "Grãos",
-    },
-    {
-      condicao: possuiHorticultura,
-      key: "horticultura",
-      titulo: "Horticultura",
-    },
-    {
-      condicao: possuiFruticultura,
-      key: "fruticultura",
-      titulo: "Fruticultura",
-    },
-    {
-      condicao: possuiMandioca,
-      key: "mandioca",
-      titulo: "Mandioca",
-    },
-    {
-      condicao: possuiCulturasIndustriais,
-      key: "culturasIndustriais",
-      titulo: "Culturas Industriais",
-    },
-  ];
+  const configuracoesAgricultura =
+    buildConfiguracoesAgricultura({
+      possuiGraos,
+      possuiHorticultura,
+      possuiFruticultura,
+      possuiMandioca,
+      possuiCulturasIndustriais,
+    }) as readonly ConfiguracaoAtendimento<AgriculturaKey>[];
   const possuiPiscicultura =
     tiposSelecionados.includes("Piscicultura") || atividadesAdicionais.pesca.includes("Piscicultura");
   const possuiApicultura =
@@ -640,87 +613,30 @@ export default function Atendimento() {
   const possuiPastagemVarzea = tiposPastagem.includes("Várzea") || atividadesAdicionais.pastagem.includes("Várzea");
   const possuiCapineira = tiposPastagem.includes("Capineira") || atividadesAdicionais.pastagem.includes("Capineira");
 
-  const configuracoesPecuaria: ConfiguracaoAtendimento<PecuariaKey>[] = [
-    {
-      condicao: possuiBovinocultura,
-      key: "bovinocultura",
-      titulo: "Bovinocultura",
-    },
-    {
-      condicao: possuiAvicultura,
-      key: "avicultura",
-      titulo: "Avicultura",
-    },
-    {
-      condicao: possuiSuinocultura,
-      key: "suinocultura",
-      titulo: "Suinocultura",
-    },
-    {
-      condicao: possuiBubalinocultura,
-      key: "bubalinocultura",
-      titulo: "Bubalinocultura",
-    },
-    {
-      condicao: possuiCaprinocultura,
-      key: "caprinocultura",
-      titulo: "Caprinocultura",
-    },
-    {
-      condicao: possuiOvinocultura,
-      key: "ovinocultura",
-      titulo: "Ovinocultura",
-    },
-    {
-      condicao: possuiEquinos,
-      key: "equinos",
-      titulo: "Equinos",
-    },
-    {
-      condicao: possuiCodorna,
-      key: "codorna",
-      titulo: "Codorna",
-    },
-    {
-      condicao: possuiPatoDomestico,
-      key: "patoDomestico",
-      titulo: "Pato Doméstico",
-    },
-  ];
-  const configuracoesApicultura: ConfiguracaoAtendimento<ApiculturaKey>[] = [
-    {
-      condicao: possuiApicultura,
-      key: "apicultura",
-      titulo: "Apicultura",
-    },
-    {
-      condicao: possuiMeliponicultura,
-      key: "meliponicultura",
-      titulo: "Meliponicultura",
-    },
-  ];
-  const configuracoesExtrativismo: ConfiguracaoAtendimento<ExtrativismoKey>[] = [
-    {
-      condicao: possuiMadeira,
-      key: "madeira",
-      titulo: "Produção Florestal de Madeira",
-    },
-    {
-      condicao: possuiNaoMadeireira,
-      key: "naoMadeireira",
-      titulo: "Produção Florestal Não Madeireira",
-    },
-    {
-      condicao: possuiExtrativismoVegetal,
-      key: "vegetal",
-      titulo: "Extrativismo Vegetal",
-    },
-    {
-      condicao: possuiExtrativismoMineral,
-      key: "mineral",
-      titulo: "Extrativismo Mineral",
-    },
-  ];
+  const configuracoesPecuaria =
+    buildConfiguracoesPecuaria({
+      possuiBovinocultura,
+      possuiAvicultura,
+      possuiSuinocultura,
+      possuiBubalinocultura,
+      possuiCaprinocultura,
+      possuiOvinocultura,
+      possuiEquinos,
+      possuiCodorna,
+      possuiPatoDomestico,
+    }) as readonly ConfiguracaoAtendimento<PecuariaKey>[];
+  const configuracoesApicultura =
+    buildConfiguracoesApicultura({
+      possuiApicultura,
+      possuiMeliponicultura,
+    }) as readonly ConfiguracaoAtendimento<ApiculturaKey>[];
+  const configuracoesExtrativismo =
+    buildConfiguracoesExtrativismo({
+      possuiMadeira,
+      possuiNaoMadeireira,
+      possuiExtrativismoVegetal,
+      possuiExtrativismoMineral,
+    }) as readonly ConfiguracaoAtendimento<ExtrativismoKey>[];
   return (
     <div className="idam-form space-y-6">
       <div>
@@ -733,122 +649,22 @@ export default function Atendimento() {
         </p>
       </div>
 
-      <div className="bg-card border border-border rounded-lg p-6 shadow-sm space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Buscar por nome ou CPF..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 pr-4 py-3 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-        </div>
-
-        {/* Filtro por Trimestre */}
-        <div>
-          <label htmlFor="trimestre" className="block text-sm font-medium text-foreground mb-2">
-            Filtrar por Trimestre de Cadastro
-          </label>
-          <select
-            id="trimestre"
-            value={trimestreSelecionado}
-            onChange={(e) => setTrimestreSelecionado(e.target.value)}
-            className="w-full px-4 py-3 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            <option value="todos">Todos os Trimestres</option>
-            <option value="1">1º Trimestre - Janeiro, Fevereiro e Março ({produtoresPorTrimestre[1].length})</option>
-            <option value="2">2º Trimestre - Abril, Maio e Junho ({produtoresPorTrimestre[2].length})</option>
-            <option value="3">3º Trimestre - Julho, Agosto e Setembro ({produtoresPorTrimestre[3].length})</option>
-            <option value="4">4º Trimestre - Outubro, Novembro e Dezembro ({produtoresPorTrimestre[4].length})</option>
-          </select>
-        </div>
-
-        {/* Resumo por Trimestre */}
-        {trimestreSelecionado === "todos" && (
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="bg-accent/30 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{produtoresPorTrimestre[1].length}</p>
-              <p className="text-xs text-muted-foreground">1º Trimestre</p>
-            </div>
-            <div className="bg-accent/30 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{produtoresPorTrimestre[2].length}</p>
-              <p className="text-xs text-muted-foreground">2º Trimestre</p>
-            </div>
-            <div className="bg-accent/30 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{produtoresPorTrimestre[3].length}</p>
-              <p className="text-xs text-muted-foreground">3º Trimestre</p>
-            </div>
-            <div className="bg-accent/30 rounded-lg p-3 text-center">
-              <p className="text-2xl font-bold text-primary">{produtoresPorTrimestre[4].length}</p>
-              <p className="text-xs text-muted-foreground">4º Trimestre</p>
-            </div>
-          </div>
-        )}
-      </div>
+      <AtendimentoFiltros
+        searchTerm={searchTerm}
+        trimestreSelecionado={trimestreSelecionado}
+        produtoresPorTrimestre={produtoresPorTrimestre}
+        onSearchTermChange={setSearchTerm}
+        onTrimestreChange={setTrimestreSelecionado}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] gap-6">
-        <div className="bg-card border border-border rounded-lg shadow-sm">
-          <div className="p-4 border-b border-border">
-            <h3 className="font-semibold text-foreground">
-              Produtores Cadastrados (
-              {produtoresFiltrados.length})
-            </h3>
-          </div>
-
-          <div className="divide-y divide-border max-h-[600px] overflow-y-auto">
-            {produtoresFiltrados.length === 0 ? (
-              <div className="p-8 text-center text-muted-foreground">
-                {searchTerm
-                  ? "Nenhum produtor encontrado"
-                  : "Nenhum produtor cadastrado"}
-              </div>
-            ) : (
-              produtoresFiltrados.map((produtor: Produtor) => {
-                const trimestre = produtor.dataCadastro ? obterTrimestre(produtor.dataCadastro) : null;
-                const dataCadastroFormatada = produtor.dataCadastro
-                  ? new Date(produtor.dataCadastro).toLocaleDateString('pt-BR')
-                  : 'Não informado';
-
-                return (
-                  <button
-                    key={produtor.id}
-                    onClick={() => handleSelectProdutor(produtor)}
-                    className={`w-full p-4 text-left hover:bg-accent transition-colors ${
-                      selectedProdutor?.id === produtor.id
-                        ? "bg-accent"
-                        : ""
-                    }`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="bg-primary/10 p-2 rounded-full mt-1">
-                        <User className="w-4 h-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground truncate">
-                          {produtor.nome}
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          CPF: {produtor.cpf}
-                        </p>
-                        {trimestre && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-primary/10 text-primary">
-                              {trimestre}º Trimestre
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                              {dataCadastroFormatada}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
+        <AtendimentoProdutoresList
+          produtores={produtoresFiltrados}
+          searchTerm={searchTerm}
+          selectedProdutorId={selectedProdutor?.id}
+          onSelectProdutor={handleSelectProdutor}
+          obterTrimestre={obterTrimestre}
+        />
 
         <div className="bg-card border border-border rounded-lg shadow-sm">
           <div className="p-4 border-b border-border">

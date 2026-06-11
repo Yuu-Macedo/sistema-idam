@@ -1,17 +1,12 @@
 import type { ProdutorBase } from "../types/produtor";
-
-const PRODUTORES_STORAGE_KEY = "produtores";
+import { readCache, RESOURCE_CACHE_KEYS, writeCache } from "./localCache";
 
 export function getProdutoresStorage(): ProdutorBase[] {
-  try {
-    return JSON.parse(localStorage.getItem(PRODUTORES_STORAGE_KEY) || "[]");
-  } catch {
-    return [];
-  }
+  return readCache<ProdutorBase[]>(RESOURCE_CACHE_KEYS.produtores, []);
 }
 
 export function setProdutoresStorage(produtores: ProdutorBase[]) {
-  localStorage.setItem(PRODUTORES_STORAGE_KEY, JSON.stringify(produtores));
+  writeCache(RESOURCE_CACHE_KEYS.produtores, produtores);
 }
 
 export function upsertProdutorStorage(produtor: ProdutorBase) {

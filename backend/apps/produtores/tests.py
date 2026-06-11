@@ -27,7 +27,7 @@ class ProdutorApiTests(APITestCase):
         )
         self.client.force_authenticate(self.admin)
 
-    def produtor_payload(self, cpf="12345678901"):
+    def produtor_payload(self, cpf="52998224725"):
         return {
             "nome_completo": "Maria da Silva",
             "cpf": cpf,
@@ -42,6 +42,12 @@ class ProdutorApiTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Produtor.objects.count(), 1)
+
+    def test_rejeita_cpf_com_digitos_verificadores_invalidos(self):
+        response = self.client.post(reverse("produtores-list"), self.produtor_payload("52998224724"), format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("cpf", response.data)
 
     def test_listagem_de_produtores(self):
         Produtor.objects.create(**self.produtor_payload(), cadastrado_por=self.admin)
@@ -113,6 +119,6 @@ class ProdutorApiTests(APITestCase):
     def test_visualizador_nao_cria_produtor(self):
         self.client.force_authenticate(self.viewer)
 
-        response = self.client.post(reverse("produtores-list"), self.produtor_payload("12345678902"), format="json")
+        response = self.client.post(reverse("produtores-list"), self.produtor_payload("11144477735"), format="json")
 
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

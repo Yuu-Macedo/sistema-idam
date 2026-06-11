@@ -6,6 +6,7 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { toast } from "sonner";
 import { LoadingRoute } from "../components/layout/LoadingRoute";
 import { AppShell } from "./layout/AppShell";
 import {
@@ -20,8 +21,11 @@ import {
   getUsuarioLogado,
 } from "../services/authStorage";
 import { loginWithApi, logoutWithApi } from "../services/authApi";
+import { SESSION_EXPIRED_EVENT } from "../services/apiClient";
 import { fetchProdutoresApi } from "../services/produtoresApi";
 import { syncApiResourcesToLocalStorage } from "../services/resourcesApi";
+import { writeResourceSnapshot } from "../services/localCache";
+import { flushSyncQueue, getSyncQueue } from "../services/syncQueue";
 
 const Login = lazy(() => import("../pages/Auth/LoginPage"));
 
@@ -52,9 +56,25 @@ export default function App() {
   useEffect(() => {
     if (!usuarioLogado) return;
 
+    flushSyncQueue()
+      .then(({ flushed, pending }) => {
+        if (flushed) {
+          toast.success(`${flushed} operacao pendente sincronizada.`);
+        }
+        if (pending) {
+          toast.warning(`${pending} operacao continua pendente de sincronizacao.`);
+        }
+      })
+      .catch(() => {
+        const pending = getSyncQueue().length;
+        if (pending) {
+          toast.warning(`${pending} operacao pendente sera reenviada depois.`);
+        }
+      });
+
     fetchProdutoresApi()
       .then((produtores) => {
-        localStorage.setItem("produtores", JSON.stringify(produtores));
+        writeResourceSnapshot({ produtores });
       })
       .catch((error) => {
         console.warn("Não foi possível sincronizar produtores com a API.", error);
@@ -64,6 +84,18 @@ export default function App() {
       console.warn("Não foi possível sincronizar recursos extras com a API.", error);
     });
   }, [usuarioLogado]);
+
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      clearUsuarioLogado();
+      setUsuarioLogado(null);
+      toast.error("Sua sessao expirou. Entre novamente.");
+      navigate("/login", { replace: true });
+    };
+
+    window.addEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+    return () => window.removeEventListener(SESSION_EXPIRED_EVENT, handleSessionExpired);
+  }, [navigate]);
 
   useEffect(() => {
     const handleClickFora = (event: MouseEvent) => {
